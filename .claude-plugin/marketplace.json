@@ -8,8 +8,26 @@
     {
       "name": "development-skills",
       "description": "Structured development workflow with 7-phase quality gates, subagent orchestration, and multi-language support",
-      "version": "0.0.8",
+      "version": "0.0.19",
       "source": "./plugins/development-skills"
+    },
+    {
+      "name": "best-practices",
+      "description": "Research and synthesize current best practices for any technology topic with temporal calibration and authority verification",
+      "version": "0.0.1",
+      "source": "./plugins/best-practices"
+    },
+    {
+      "name": "resolve-merge",
+      "description": "Systematic merge conflict resolution with special handling for numbered documents and cross-references",
+      "version": "0.0.1",
+      "source": "./plugins/resolve-merge"
+    },
+    {
+      "name": "roast-my-code",
+      "description": "Code review and AI-readiness audit with scoring across 12 dimensions",
+      "version": "0.0.1",
+      "source": "./plugins/roast-my-code"
     },
     {
       "name": "adr",

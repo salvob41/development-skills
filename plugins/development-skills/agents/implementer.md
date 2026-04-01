@@ -36,6 +36,8 @@ Do NOT comment what clean, well-named code already says.
 
 ### Anti-Poisoning Verification
 
+**At startup (if worktree):** `git branch --show-current` — if branch doesn't match expected, return error immediately.
+
 After each task, **verify all references are grounded:**
 - Confirm file paths exist (Glob/Grep)
 - Confirm function signatures match actual source
@@ -55,6 +57,20 @@ After each task, **verify all references are grounded:**
 7. Run tests — zero `ImportError`s
 
 **Never report a split as complete without updating ALL callers and mock paths.**
+
+### Verification Gate — Mandatory 5-Step Protocol
+
+**Before ANY positive claim** ("tests pass", "implementation complete", "no issues"):
+
+1. **IDENTIFY** — What command proves this claim? Name it.
+2. **RUN** — Execute the FULL command. Fresh, complete, no partial runs.
+3. **READ** — Read full output. Check exit code. Count pass/fail.
+4. **VERIFY** — Does the output actually confirm the claim?
+   - YES → State claim WITH evidence (command + result)
+   - NO → State actual status with evidence. Do NOT rationalize.
+5. **CLAIM** — Only now make the assertion.
+
+**Skip any step = lying, not verifying.** "I'm confident" is not a step.
 
 ### Verification Honesty
 

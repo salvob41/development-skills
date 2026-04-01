@@ -1,0 +1,6 @@
+{
+  "name": "best-practices",
+  "description": "Research and synthesize current best practices for any technology topic with temporal calibration and authority verification",
+  "version": "0.0.1",
+  "triggers": ["best practices", "current best practices", "state of the art", "research best practices"]
+}

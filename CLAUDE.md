@@ -2,20 +2,23 @@
 
 ## Project Overview
 
-Open-source Claude Code plugin marketplace. Contains 4 independently installable plugins for structured development workflows, architecture decisions, documentation, and database integration.
+Open-source Claude Code plugin marketplace. Contains 7 independently installable plugins for structured development workflows, architecture decisions, documentation, database integration, best practices research, merge resolution, and code auditing.
 
 ## Project Structure
 
 ```
 plugins/                          # Claude Code plugins (each independently installable)
-  development-skills/             # Dev workflow: 19 skills, 3 subagents, 7-phase gates
+  development-skills/             # Dev workflow: 20 skills, 3 subagents, 7-phase gates
+  best-practices/                 # Research best practices with authority verification
+  resolve-merge/                  # Systematic merge conflict resolution
+  roast-my-code/                  # Code review + AI-readiness audit
   adr/                            # Architecture Decision Records
   project-documenter/             # Codebase documentation generator
   postgres-mcp/                   # PostgreSQL MCP server integration
 docs/                             # Documentation
   claude-code-reference/          # Official Claude Code reference docs
-.claude-plugin/plugin.json        # Plugin metadata + version (v0.0.8)
-.claude-plugin/marketplace.json   # Marketplace config (4 plugins)
+.claude-plugin/plugin.json        # Plugin metadata + version (v0.0.19)
+.claude-plugin/marketplace.json   # Marketplace config (7 plugins)
 VERSION                           # Project version
 LICENSE                           # MIT
 ```
