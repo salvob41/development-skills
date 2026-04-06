@@ -53,15 +53,17 @@ Full details on templates and lifecycle in the **[in-depth guide](docs/GUIDE.md)
 
 ---
 
-## 19 Skills
+## Skill Highlights
+
+This section highlights commonly used skills in the `development-skills` plugin and is not an exhaustive inventory.
 
 **Workflow** — `core-dev` (auto-activates), `brainstorming`, `debugging`, `chronicles`
 
 **Languages** — `python-dev`, `java-dev`, `typescript-dev`, `frontend-dev`, `swift-dev`
 
-**Testing** — `create-test`, `roast-my-code` (`--fix`), `eval-regression`
+**Testing** — `create-test`, `eval-regression`
 
-**Utilities** — `commit`, `distill`, `align-docs`, `resolve-merge`, `update-precommit`, `update-reqs`, `update-reqs-dev`, `best-practices`
+**Utilities** — `commit`, `distill`, `align-docs`, `create-skills`, `get-api-docs`, `update-precommit`, `update-reqs` (use `requirements-dev.in` for dev deps)
 
 Auto-format on save via hooks: ruff (Python), biome (JS/TS), google-java-format, swift-format, prettier.
 

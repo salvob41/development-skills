@@ -213,8 +213,7 @@ A `PostToolUse` hook automatically formats files when Claude edits them:
 | Skill | Trigger | What It Does |
 |-------|---------|-------------|
 | `create-test` | `/create-test` | Risk-scored test design with explorer and targeted modes |
-| `roast-my-code` | `/roast-my-code` | Brutally honest code critique + AI-readiness audit (`--fix` to auto-fix) |
-| `eval-regression` | `/eval-regression` | Pre-commit regression testing (30 evals, 98 assertions) |
+| `eval-regression` | `/eval-regression` | Pre-commit regression testing (50 evals, 175 assertions) |
 
 ### Utilities
 
@@ -224,23 +223,23 @@ A `PostToolUse` hook automatically formats files when Claude edits them:
 | `distill` | `/distill` | Semantic text compression with multilingual noise removal |
 | `chronicles` | Auto | Project snapshots capturing the WHY behind changes |
 | `align-docs` | `/align-docs` | Align documentation with current project state |
-| `resolve-merge` | `/resolve-merge` | Systematic merge conflict resolution |
+| `create-skills` | `/create-skills` | Scaffold or improve skills with the current repo's conventions |
+| `get-api-docs` | `/get-api-docs <package>` | Fetch package documentation into `tmp/` for local analysis |
 | `update-precommit` | `/update-precommit` | Update pre-commit hooks to latest versions |
 | `update-reqs` | `/update-reqs` | Update requirements.in with latest PyPI versions |
-| `update-reqs-dev` | `/update-reqs-dev` | Update requirements-dev.in with latest PyPI versions |
-| `best-practices` | `/best-practices <topic>` | Deep web research producing structured state-of-the-art report |
+| `update-reqs` | `/update-reqs requirements-dev.in` | Update requirements-dev.in with latest PyPI versions |
 
 ---
 
 ## Regression Testing
 
-**30 evals, 98 assertions** across 11 behavioral dimensions — a test suite for agent behavior. Powered by Anthropic's [`skill-creator`](https://github.com/anthropics/claude-plugins-official) plugin.
+**50 evals, 175 assertions** across 13 behavioral dimensions — a test suite for agent behavior. Powered by Anthropic's [`skill-creator`](https://github.com/anthropics/claude-plugins-official) plugin.
 
 ```
 /eval-regression
 ```
 
-Covers: brainstorming guard (7), smart isolation (6), anti-rationalization (4), performance review (3), workflow phases (3), implementer discipline (2), language detection, chronicle quality, turn boundaries, project directives, and AskUserQuestion avoidance.
+Covers: brainstorming guard (7), smart isolation (6), create-test routing and quality checks (16), anti-rationalization (4), anti-sycophancy (4), performance review (3), workflow phases (3), implementer discipline (2), language detection, chronicle quality, turn boundaries, project directives, and AskUserQuestion avoidance.
 
 Each eval snapshots the committed version as baseline, runs the modified version, and produces a verdict: **SAFE TO COMMIT** or **REGRESSIONS FOUND**.
 

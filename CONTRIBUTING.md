@@ -30,7 +30,7 @@ This plugin enforces discipline on AI agents — we hold ourselves to the same s
 
 ## Regression Testing with skill-creator
 
-The plugin ships with **27 evals and 89 assertions** covering 10 behavioral dimensions. These are the project's test suite — the equivalent of unit tests for a skill-based system.
+The plugin ships with **50 evals and 175 assertions** covering 13 behavioral dimensions. These are the project's test suite — the equivalent of unit tests for a skill-based system.
 
 ### Eval Categories
 
@@ -39,9 +39,12 @@ The plugin ships with **27 evals and 89 assertions** covering 10 behavioral dime
 | `brainstorming-guard` | 7 | Triggers brainstorming when needed, skips when appropriate |
 | `smart-isolation` | 6 | Parallel vs single agent decisions, worktree safety |
 | `anti-rationalization` | 4 | Resists shortcuts, catches flawed premises |
+| `anti-sycophancy` | 4 | Pushes back on agreeable but weak technical directions |
+| `create-test` | 16 | Test planning, routing, DB integration, E2E, and eval generation behavior |
 | `workflow-phases` | 3 | Phase progression, resumption, plan discovery |
 | `implementer-discipline` | 2 | TDD, caller updates, verification honesty |
 | `language-detection` | 1 | Frontend vs TypeScript backend routing |
+| `performance-review` | 3 | Performance analysis and evidence standards |
 | `chronicle-quality` | 1 | WHY documentation quality |
 | `askuserquestion-avoidance` | 1 | Uses conversational text, not AskUserQuestion tool |
 | `turn-boundary` | 1 | Stops at the right moment, doesn't overflow turns |
@@ -57,7 +60,7 @@ Use the `/eval-regression` skill or run manually with `skill-creator`:
 
 This will:
 1. **Snapshot** the current committed version as baseline
-2. **Execute** all 27 evals against both baseline and your modified version
+2. **Execute** all 50 evals against both baseline and your modified version
 3. **Grade** each eval's assertions (pass/fail with evidence)
 4. **Compare** results and generate a regression report
 5. **Verdict**: `SAFE TO COMMIT` or `REGRESSIONS FOUND`
@@ -68,7 +71,7 @@ This will:
 plugins/
 ├── development-skills/              # Your plugin (modified)
 │   └── evals/
-│       └── evals.json               # Eval definitions (27 evals, 89 assertions)
+│       └── evals.json               # Eval definitions (50 evals, 175 assertions)
 └── development-skills-workspace/    # Created by skill-creator (gitignored)
     ├── skill-snapshot/              # Baseline snapshot
     └── iteration-N/
@@ -156,7 +159,7 @@ All changes must align with the [Model Behavior Principles](CLAUDE.md):
 
 ## Pull Request Checklist
 
-- [ ] Ran `/eval-regression` — all 27 evals pass (zero regressions)
+- [ ] Ran `/eval-regression` — all 50 evals pass (zero regressions)
 - [ ] `benchmark.md` pasted in PR description
 - [ ] New evals added for any new or modified behavior
 - [ ] One concern per PR

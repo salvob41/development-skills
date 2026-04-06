@@ -1,6 +1,6 @@
 ---
 name: update-reqs
-description: "Use when user wants to update requirements.in or requirements-dev.in with latest PyPI versions while preserving version patterns. Handles both update-reqs and update-reqs-dev use cases."
+description: "Use when user wants to update requirements.in or requirements-dev.in with latest PyPI versions while preserving version patterns. Pass requirements-dev.in to target dev dependencies."
 user-invocable: true
 ---
 

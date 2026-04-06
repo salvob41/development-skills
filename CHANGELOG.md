@@ -1,3 +1,29 @@
+## 0.0.20 (2026-04-06)
+
+### Feat
+
+- sync upstream v0.0.20 into the marketplace layout
+- add the contributor guide, in-depth guide, and workflow architecture assets
+- integrate anti-slop guidance into reviewer and verification workflow files
+
+### Fix
+
+- address roast-my-code audit follow-ups across skill docs and repository metadata
+- standardize docs on the parameterized `update-reqs` workflow for both requirements files
+- remove redundant distill eval manifests so `/eval-regression` has a single source of truth
+
+## 0.0.19 (2026-04-01)
+
+### Feat
+
+- sync upstream v0.0.19 and split `best-practices`, `resolve-merge`, and `roast-my-code` into standalone plugins
+- add the development-skills regression suite, distill fixtures, and expanded create-test references
+- improve core workflow, language skills, and staff reviewer guidance
+
+### Fix
+
+- refine lightweight-mode and session-start guidance for the marketplace structure
+
 ## 0.0.18 (2026-03-31)
 
 ### Feat

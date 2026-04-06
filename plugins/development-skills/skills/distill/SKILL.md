@@ -39,7 +39,7 @@ FILE="<path>"; echo "BEFORE: $(wc -c < "$FILE") chars | $(wc -w < "$FILE") words
 
 ## Step 1.5 — Deterministic Pre-Processing
 
-Read `references/deterministic-patterns.md` in this skill's directory. It contains the full pattern list (verbose constructions, hedges, filler openers, transitions, slop buzzwords) and a ready-to-run Bash/Python command. Apply it exactly as written there, substituting `<path>` with the current file path.
+Read `references/deterministic-patterns.md` in this skill's directory. It contains the full pattern list (verbose constructions, hedges, filler openers, transitions, slop buzzwords). Apply those substitutions deterministically before Step 2, using Bash or Python in the current workspace as needed.
 
 This step handles mechanical substitutions the LLM might miss. The LLM in Step 2 then focuses on semantic compression.
 
