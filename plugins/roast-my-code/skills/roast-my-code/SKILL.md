@@ -10,6 +10,8 @@ effort: max
 
 > **Requires:** The `development-skills` plugin must be installed (provides the staff-reviewer agent).
 
+This skill is host-agnostic. Use the host's available subagent/delegation mechanism to run the `development-skills:staff-reviewer` review pass.
+
 **Announce:** "Using the roast-my-code skill. Preparing to roast your code without mercy."
 
 ## Target Resolution
@@ -31,7 +33,9 @@ Before roasting, understand the terrain:
 
 ## Step 2 — Staff Review (Code Quality Roast)
 
-Spawn the `development-skills:staff-reviewer` agent (Agent tool, `subagent_type: "development-skills:staff-reviewer"`).
+Spawn the `development-skills:staff-reviewer` subagent using the host's agent/delegation mechanism.
+- In Codex, use `spawn_agent`.
+- In Claude Code, use the Agent or Task mechanism that resolves `development-skills:staff-reviewer`.
 
 Build the target description based on scope:
 - **Entire repo:** `"Standalone review. Target: the entire repository at <cwd>. Read the project structure, then systematically review all source files."`
