@@ -9,6 +9,8 @@ allowed-tools: Bash, Read, Grep
 
 Commit staged changes with a conventional commits message.
 
+This skill is host-agnostic: in Codex, ChatGPT, or Claude-style environments, use the available shell tool to run the git commands below.
+
 ## Instructions
 
 1. `git status` — see staged changes (never use -uall)

@@ -2,7 +2,7 @@
 name: core-dev
 description: "Use when any coding, development, analysis, debugging, or code-related task is detected. Triggers on: implementing features, fixing bugs, refactoring code, reviewing diffs, investigating errors, evaluating approaches, or making architecture decisions."
 user-invocable: false
-allowed-tools: Glob, Read, Bash, Task, Skill, EnterPlanMode, Edit, Write
+allowed-tools: Glob, Read, Bash, Task, Skill, Edit, Write
 ---
 
 # Development Workflow Director
@@ -86,3 +86,7 @@ Check in this order (first match wins):
 **Do NOT write any code before invoking the language skill.** The language skill loads the mandatory workflow that governs ALL development work.
 
 If the language skill is already in your context: defer to it. Do NOT re-invoke.
+
+Use the host's native skill invocation mechanism:
+- In Codex, rely on skill loading/invocation supported by the environment.
+- In Claude Code, use the Skill tool.

@@ -7,7 +7,7 @@ allowed-tools: Glob, Read, Edit, Task, Skill
 
 # Brainstorming — Orchestrator
 
-You delegate ALL analysis to an isolated Task agent. You do NOT analyze, research, or read code yourself.
+You delegate ALL analysis to an isolated subagent. You do NOT analyze, research, or read code yourself.
 
 ## TASK CONTEXT
 
@@ -22,7 +22,10 @@ If `$ARGUMENTS` is empty: Display "What would you like me to analyze?" Then STOP
 1. Glob `**/brainstorming/analysis-agent.md` (fallback: `~/.claude/plugins/`)
 2. Read it. Note the directory (= skill directory).
 3. Replace `{TASK}` with complete task context and `{SKILL_DIR}` with directory path
-4. Spawn via Task tool: `subagent_type: general-purpose`, `model: opus`
+4. Spawn an analysis subagent using the host's subagent/delegation tool.
+   - In Codex, use `spawn_agent`.
+   - In Claude Code, use the Task tool.
+   - Give the subagent the complete task context and the resolved skill directory.
 
 **Do NOT analyze yourself. Do NOT follow the agent's instructions.**
 
@@ -113,7 +116,7 @@ Append to plan file at `[PLAN_PATH]`:
 
 > **Approach confirmed: [name].** Starting development workflow.
 
-Invoke `development-skills:core-dev` via Skill tool (no args — Step 1 detects active plan).
+Invoke `development-skills:core-dev` via the host's skill mechanism with no args so Step 1 detects the active plan.
 
 ### 4c: Abandon
 
