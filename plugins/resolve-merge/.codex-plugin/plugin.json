@@ -1,0 +1,34 @@
+{
+  "name": "resolve-merge",
+  "version": "0.0.1",
+  "description": "Systematic merge conflict resolution with special handling for numbered documents and cross-references.",
+  "author": {
+    "name": "reidemeister94",
+    "url": "https://github.com/reidemeister94"
+  },
+  "homepage": "https://github.com/reidemeister94/development-skills/tree/main/plugins/resolve-merge",
+  "repository": "https://github.com/reidemeister94/development-skills",
+  "license": "MIT",
+  "keywords": [
+    "merge",
+    "git",
+    "conflicts",
+    "review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Resolve Merge",
+    "shortDescription": "Resolve merge conflicts systematically",
+    "longDescription": "Adds a merge-resolution workflow with extra guidance for numbered documents, references, and cross-file consistency checks.",
+    "developerName": "reidemeister94",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/reidemeister94/development-skills",
+    "defaultPrompt": [
+      "Resolve the current merge conflicts using the merge workflow"
+    ]
+  }
+}

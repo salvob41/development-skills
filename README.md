@@ -10,12 +10,20 @@ A Claude Code plugin that turns your AI agent into a disciplined software engine
 
 ## Installation
 
+### Claude Code
+
 ```bash
 /plugin marketplace add reidemeister94/development-skills
 /plugin install development-skills@development-skills
 ```
 
 Activates automatically on any coding task. No configuration needed.
+
+### Codex
+
+This repo now also ships Codex plugin manifests under `plugins/*/.codex-plugin/plugin.json` and a Codex marketplace catalog at `.agents/plugins/marketplace.json`.
+
+The packaged structure is available to Codex, but some skill bodies still contain Claude-specific instructions and may need follow-up adaptation for perfect runtime parity.
 
 ---
 

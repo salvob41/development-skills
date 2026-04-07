@@ -1,0 +1,35 @@
+{
+  "name": "postgres-mcp",
+  "version": "1.0.0",
+  "description": "PostgreSQL MCP setup workflow for adding database connections through a local launcher script.",
+  "author": {
+    "name": "reidemeister94",
+    "url": "https://github.com/reidemeister94"
+  },
+  "homepage": "https://github.com/reidemeister94/development-skills/tree/main/plugins/postgres-mcp",
+  "repository": "https://github.com/reidemeister94/development-skills",
+  "license": "MIT",
+  "keywords": [
+    "postgres",
+    "mcp",
+    "database",
+    "infrastructure"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Postgres MCP",
+    "shortDescription": "Set up PostgreSQL MCP connections",
+    "longDescription": "Adds the postgres setup skill and launcher script used to configure project-level PostgreSQL MCP connections for local agent workflows.",
+    "developerName": "reidemeister94",
+    "category": "Infrastructure",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/reidemeister94/development-skills",
+    "defaultPrompt": [
+      "Set up a PostgreSQL MCP connection for this project"
+    ]
+  }
+}

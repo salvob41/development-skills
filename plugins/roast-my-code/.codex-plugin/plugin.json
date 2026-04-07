@@ -1,0 +1,34 @@
+{
+  "name": "roast-my-code",
+  "version": "0.0.1",
+  "description": "Code review and AI-readiness audit with scoring across 12 dimensions.",
+  "author": {
+    "name": "reidemeister94",
+    "url": "https://github.com/reidemeister94"
+  },
+  "homepage": "https://github.com/reidemeister94/development-skills/tree/main/plugins/roast-my-code",
+  "repository": "https://github.com/reidemeister94/development-skills",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "audit",
+    "quality",
+    "ai-readiness"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Roast My Code",
+    "shortDescription": "Run a harsh code review and AI-readiness audit",
+    "longDescription": "Performs a direct code review and AI-readiness audit, with scoring across maintainability, robustness, and agent usability dimensions.",
+    "developerName": "reidemeister94",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/reidemeister94/development-skills",
+    "defaultPrompt": [
+      "Review this codebase and give me the full roast with AI-readiness findings"
+    ]
+  }
+}

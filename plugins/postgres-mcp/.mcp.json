@@ -1,0 +1,4 @@
+{
+  "_instructions": "This plugin ships setup assets for PostgreSQL MCP connections. Use the postgres-setup skill to add concrete servers to your project-level .mcp.json with DATABASE_URI and ACCESS_MODE.",
+  "mcpServers": {}
+}

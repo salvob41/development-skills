@@ -1,0 +1,36 @@
+{
+  "name": "development-skills",
+  "version": "0.0.20",
+  "description": "Structured development workflow with quality gates, specialist skills, hooks, and multi-language support.",
+  "author": {
+    "name": "reidemeister94",
+    "url": "https://github.com/reidemeister94"
+  },
+  "homepage": "https://github.com/reidemeister94/development-skills",
+  "repository": "https://github.com/reidemeister94/development-skills",
+  "license": "MIT",
+  "keywords": [
+    "coding",
+    "workflow",
+    "testing",
+    "review",
+    "skills"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks.json",
+  "interface": {
+    "displayName": "Development Skills",
+    "shortDescription": "Structured coding workflow with specialist skills",
+    "longDescription": "Adds a disciplined coding workflow for agents, including planning, implementation, verification, review, documentation, and language-specific engineering guidance.",
+    "developerName": "reidemeister94",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/reidemeister94/development-skills",
+    "defaultPrompt": [
+      "Use the development workflow to research, implement, verify, and review this coding task"
+    ]
+  }
+}

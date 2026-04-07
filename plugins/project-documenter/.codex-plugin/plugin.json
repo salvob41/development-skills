@@ -1,0 +1,34 @@
+{
+  "name": "project-documenter",
+  "version": "1.0.0",
+  "description": "Generate detailed project documentation from a codebase.",
+  "author": {
+    "name": "reidemeister94",
+    "url": "https://github.com/reidemeister94"
+  },
+  "homepage": "https://github.com/reidemeister94/development-skills/tree/main/plugins/project-documenter",
+  "repository": "https://github.com/reidemeister94/development-skills",
+  "license": "MIT",
+  "keywords": [
+    "documentation",
+    "codebase",
+    "architecture",
+    "markdown"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Project Documenter",
+    "shortDescription": "Generate detailed documentation from a codebase",
+    "longDescription": "Uses documentation skills, templates, and validation scripts to generate structured markdown documentation directly from repository context.",
+    "developerName": "reidemeister94",
+    "category": "Documentation",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/reidemeister94/development-skills",
+    "defaultPrompt": [
+      "Generate project documentation for this repository"
+    ]
+  }
+}

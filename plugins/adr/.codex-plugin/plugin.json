@@ -1,0 +1,34 @@
+{
+  "name": "adr",
+  "version": "1.0.0",
+  "description": "Architecture Decision Records: create, list, and manage ADRs for any project.",
+  "author": {
+    "name": "reidemeister94",
+    "url": "https://github.com/reidemeister94"
+  },
+  "homepage": "https://github.com/reidemeister94/development-skills/tree/main/plugins/adr",
+  "repository": "https://github.com/reidemeister94/development-skills",
+  "license": "MIT",
+  "keywords": [
+    "adr",
+    "architecture",
+    "documentation",
+    "decision-records"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ADR",
+    "shortDescription": "Create, browse, and update architecture decisions",
+    "longDescription": "Use ADR skills to capture architectural decisions, list previous records, and update decision state in a consistent format.",
+    "developerName": "reidemeister94",
+    "category": "Documentation",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/reidemeister94/development-skills",
+    "defaultPrompt": [
+      "Create or update an ADR for the architectural decision I am making"
+    ]
+  }
+}

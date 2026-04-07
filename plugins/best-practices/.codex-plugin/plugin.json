@@ -1,0 +1,33 @@
+{
+  "name": "best-practices",
+  "version": "0.0.1",
+  "description": "Research and synthesize current best practices for any technology topic with temporal calibration and authority verification.",
+  "author": {
+    "name": "reidemeister94",
+    "url": "https://github.com/reidemeister94"
+  },
+  "homepage": "https://github.com/reidemeister94/development-skills/tree/main/plugins/best-practices",
+  "repository": "https://github.com/reidemeister94/development-skills",
+  "license": "MIT",
+  "keywords": [
+    "research",
+    "best-practices",
+    "technology",
+    "verification"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Best Practices",
+    "shortDescription": "Research current best practices for a technical topic",
+    "longDescription": "Use this plugin to research up-to-date best practices, prioritize authoritative sources, and synthesize guidance with explicit temporal checks.",
+    "developerName": "reidemeister94",
+    "category": "Research",
+    "capabilities": [
+      "Interactive"
+    ],
+    "websiteURL": "https://github.com/reidemeister94/development-skills",
+    "defaultPrompt": [
+      "Research the current best practices for this technology and cite strong sources"
+    ]
+  }
+}
