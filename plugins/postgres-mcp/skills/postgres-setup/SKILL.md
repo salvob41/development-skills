@@ -1,7 +1,6 @@
 ---
 name: postgres-setup
-description: "Add a PostgreSQL database connection to this project via MCP. Use when asked to 'connect to PostgreSQL', 'add a database connection', 'set up the Postgres MCP', 'configure database access for Claude', or 'I want Claude to query my database'."
-compatibility: Claude Code
+description: "Add a PostgreSQL database connection to this project via MCP. Use when asked to 'connect to PostgreSQL', 'add a database connection', 'set up the Postgres MCP', 'configure database access for Codex or Claude', or 'I want the agent to query my database'."
 metadata:
   author: salvob41
   version: 1.0.0
@@ -13,6 +12,8 @@ metadata:
 
 Add a PostgreSQL database connection. Each invocation adds ONE connection.
 Run `/postgres-setup` again to add more databases.
+
+Reference: CrystalDBA `postgres-mcp` is the backend used by this skill.
 
 ## When This Triggers
 
@@ -57,7 +58,7 @@ command -v uvx &>/dev/null && echo "RUNTIME=uvx" || (command -v pipx &>/dev/null
 
 ### Step 3: Ask for Connection Details
 
-Ask the user these 3 questions using AskUserQuestion:
+Ask the user these 3 questions using the host's normal question/input mechanism:
 
 1. **Connection name**: "What name should this connection have? This becomes the MCP server name."
    - Examples: `postgres-shipping-dev`, `postgres-billing-prod`, `postgres-analytics-staging`
@@ -77,19 +78,14 @@ Ask the user these 3 questions using AskUserQuestion:
 Locate the run script:
 
 ```bash
-find ~/.claude -name "run_postgres_mcp.sh" -path "*/postgres-mcp/*" 2>/dev/null | head -1
-```
-
-If not found:
-```bash
-find ~/Documents ~/dev ~/workspace -path "*/postgres-mcp/scripts/run_postgres_mcp.sh" 2>/dev/null | head -1
+find ~/.codex ~/.claude ~/Documents ~/dev ~/workspace -path "*/postgres-mcp/scripts/run_postgres_mcp.sh" 2>/dev/null | head -1
 ```
 
 Store the absolute path to `run_postgres_mcp.sh` as SCRIPT_PATH.
 
 ### Step 5: Generate Configuration
 
-Add this ONE server to both config files. **Always merge — never overwrite existing entries.**
+Add this ONE server to the project MCP config. **Always merge — never overwrite existing entries.**
 
 **`.mcp.json`** in project root:
 
@@ -112,18 +108,14 @@ Read existing file (or start with `{}`), add the new server under `mcpServers`:
 Use Read to load existing `.mcp.json`, add the new key to `mcpServers`, use Write to save.
 If the name already exists, overwrite that entry (allows reconfiguration).
 
-**`.claude/settings.local.json`**:
-
-Read existing file (or start with `{}`), append to the arrays (skip if already present):
-
-- `enabledMcpjsonServers`: add `"<NAME>"`
+**Host-specific note:** if the MCP host needs an extra opt-in step to load project MCP servers, tell the user what remains. For Claude-style hosts that use `.claude/settings.local.json`, update that file only when needed by that host.
 
 ### Step 6: Done
 
 Tell the user:
 1. "Added **<NAME>** to `.mcp.json`."
-2. "**Restart Claude Code** to load the new MCP server."
-3. "After restart, run `/mcp` to verify the server appears and is connected."
+2. "Restart your MCP host if required to load the new server."
+3. "After restart, verify the server appears and is connected."
 4. "Test it: 'List schemas using <NAME>'"
 5. "To add another database connection, just run `/postgres-setup` again."
 
@@ -134,14 +126,14 @@ If setup completed but tools still don't work:
 1. **Check runtime**: `uvx --version` or `pipx --version` or `docker info`
 2. **Test DATABASE_URI manually**: `psql "$DATABASE_URI" -c "SELECT 1"`
 3. **Check .mcp.json**: verify the server entry and DATABASE_URI are correct
-4. **Check /mcp**: run `/mcp` in Claude Code to see server status and errors
+4. **Check your MCP host status UI/command**: verify the server status and startup errors
 
 ## Examples
 
 ### Example 1: Add a primary database
-User says: "Connect Claude to our production database"
+User says: "Connect the agent to our production database"
 Actions: Ask for connection URI + name → write .mcp.json entry → confirm setup
-Result: Database accessible as MCP tool, Claude can run queries
+Result: Database accessible as MCP tool, the agent can run queries
 
 ### Example 2: Add a second database
 User says: "Also connect to our analytics database"
