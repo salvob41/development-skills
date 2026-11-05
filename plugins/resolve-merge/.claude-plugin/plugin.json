@@ -1,6 +1,6 @@
 {
   "name": "resolve-merge",
   "description": "Systematic merge conflict resolution with special handling for numbered documents and cross-references",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "triggers": ["merge conflict", "resolve merge", "fix conflicts", "merge resolution"]
 }

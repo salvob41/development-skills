@@ -1,6 +1,6 @@
 {
   "name": "development-skills",
-  "version": "0.0.20",
+  "version": "0.1.0",
   "description": "Structured development workflow with quality gates, specialist skills, hooks, and multi-language support.",
   "author": {
     "name": "reidemeister94",

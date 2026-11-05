@@ -3,6 +3,12 @@ VERSION=v`cat $(FILE)`
 
 ndef = $(if $(value $(1)),,$(error $(1) not set, provide $(1), e.g. make $(1)=<value> <target>))
 
+setup:
+	./global/install.sh
+
+sync-upstream:
+	./scripts/upstream-skills.sh
+
 clean:
 	find . -type d -name __pycache__ -prune -exec rm -rf {} \;
 	find . -type d -name .hypothesis -prune -exec rm -rf {} \;

@@ -8,7 +8,7 @@ Open-source Claude Code plugin marketplace. Contains 7 independently installable
 
 ```
 plugins/                          # Claude Code plugins (each independently installable)
-  development-skills/             # Dev workflow: 20 skills, 3 subagents, 7-phase gates
+  development-skills/             # Dev workflow: 33 skills, 3 subagents, 7-phase gates
   best-practices/                 # Research best practices with authority verification
   resolve-merge/                  # Systematic merge conflict resolution
   roast-my-code/                  # Code review + AI-readiness audit
@@ -17,7 +17,9 @@ plugins/                          # Claude Code plugins (each independently inst
   postgres-mcp/                   # PostgreSQL MCP server integration
 docs/                             # Documentation
   claude-code-reference/          # Official Claude Code reference docs
-.claude-plugin/plugin.json        # Plugin metadata + version (v0.0.20)
+global/                           # Personal global CLAUDE.md, skill links + per-machine installer
+scripts/                          # One-way upstream skill sync
+.claude-plugin/plugin.json        # Plugin metadata + version (v0.1.0)
 .claude-plugin/marketplace.json   # Marketplace config (7 plugins)
 VERSION                           # Project version
 LICENSE                           # MIT
@@ -30,6 +32,14 @@ LICENSE                           # MIT
 - Skills follow the SKILL.md frontmatter specification
 - Agents are defined in `agents/` as markdown files
 - Reference docs in `docs/claude-code-reference/` for skills/hooks/agents/MCP development
+
+## Upstream
+
+This fork deliberately diverges from `reidemeister94/development-skills` and keeps the `plugins/` layout. Sync is one-way, upstream to here:
+
+- Never open PRs or push to upstream.
+- Never run `git merge upstream/main`: the histories are unrelated and the layouts differ.
+- Sync skills with `make sync-upstream`, which adds new skills and updates those without local edits. Skills listed in `scripts/upstream-skip` are never touched, and `scripts/upstream-base` records the last synced commit.
 
 # Model Behavior Principles
 

@@ -1,0 +1,2 @@
+ponytail https://raw.githubusercontent.com/DietrichGebert/ponytail/main/skills/ponytail/SKILL.md
+unslop https://raw.githubusercontent.com/cursor/plugins/main/pstack/skills/unslop/SKILL.md
