@@ -33,7 +33,9 @@ To configure a connection by hand, add it to `.mcp.json` in your project root. U
 }
 ```
 
-`.mcp.json` holds the password in plain text, so add it to `.gitignore`.
+The config file holds the password in plain text, so add it to `.gitignore`.
+
+Cursor uses the same format in `.cursor/mcp.json`. Codex uses `.codex/config.toml`, and OpenCode uses `opencode.json`. `/toolbox-setup` writes the right format for each.
 
 ## Read-only access
 

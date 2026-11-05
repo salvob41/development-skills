@@ -76,4 +76,4 @@ for file in $(git ls-tree -r --name-only "$ref" shared/ hooks/ agents/ evals/); 
 done
 
 git rev-parse "$ref" >"$base_file"
-echo "synced to $(git rev-parse --short "$ref"). Review with git diff, then bump the plugin version."
+echo "synced to $(git rev-parse --short "$ref"). Review with git diff, run make portable-skills, then bump the plugin version."

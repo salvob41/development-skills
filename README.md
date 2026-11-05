@@ -1,123 +1,117 @@
 # development-skills
 
-A Claude Code plugin that turns your AI agent into a disciplined software engineer.
+Skills and plugins for coding agents: a structured development loop, language-specific guidance, code review, architecture decisions, project documentation, and PostgreSQL access. They work with Claude Code, Codex, and other agents that support the [Agent Skills standard](https://agentskills.io).
 
-<a href="https://github.com/reidemeister94/development-skills/releases"><img src="https://img.shields.io/github/v/release/reidemeister94/development-skills?style=flat-square&color=blue" alt="Release"/></a>
-<a href="LICENSE"><img src="https://img.shields.io/github/license/reidemeister94/development-skills?style=flat-square" alt="License"/></a>
-<a href="https://github.com/reidemeister94/development-skills/stargazers"><img src="https://img.shields.io/github/stars/reidemeister94/development-skills?style=flat-square&color=yellow" alt="Stars"/></a>
+Based on [reidemeister94/development-skills](https://github.com/reidemeister94/development-skills).
 
----
+## How this differs from upstream
+
+| | Upstream | This repo |
+|---|---|---|
+| Packaging | One plugin | 7 plugins you install separately |
+| Other agents | Documents Claude Code and Codex installs | Also generates standard skills for any compatible agent |
+| Language skills | None | `python-dev`, `java-dev`, `typescript-dev`, `frontend-dev`, `swift-dev` |
+| Plans and debugging | No `chronicles` or `debugging` skill | Both included |
+| Other skills only here | None | `create-skills`, `get-api-docs`, `update-precommit`, `update-reqs` |
+| Plugins only here | None | `adr`, `project-documenter`, `toolbox-mcp` |
+| `best-practices`, `resolve-merge`, `roast-my-code` | Skills in the main plugin | Separate plugins, with local versions of `best-practices` and `roast-my-code` |
+| Machine setup | None | `make setup` links `global/CLAUDE.md` and downloads `ponytail` and `unslop` |
 
 ## Installation
+
+Agents get different features depending on what they support:
+
+| Tier | Agents | What you get | How far we checked |
+|---|---|---|---|
+| Full | Claude Code | Plugins with hooks and subagents | Primary platform |
+| Full | Codex | Plugins, or the skills below | Ran a skill and its shared files from the generated copy. Hooks depend on the Codex version |
+| Skills | OpenCode | All skills | Found all 40, without a model run |
+| Skills | Cursor | All skills | Installed only, not yet run |
+| Best effort | Other [supported agents](https://github.com/vercel-labs/skills/blob/main/docs/agents.md) | All skills | Not tested |
 
 ### Claude Code
 
 ```bash
-/plugin marketplace add reidemeister94/development-skills
-/plugin install development-skills@development-skills
+/plugin marketplace add salvob41/development-skills
+/plugin install development-skills@development-skills-marketplace
 ```
 
-Activates automatically on any coding task. No configuration needed.
+Install the other plugins the same way, using the names below.
 
 ### Codex
 
-This repo now also ships Codex plugin manifests under `plugins/*/.codex-plugin/plugin.json` and a Codex marketplace catalog at `.agents/plugins/marketplace.json`.
-
-The packaged structure is available to Codex, but some skill bodies still contain Claude-specific instructions and may need follow-up adaptation for perfect runtime parity.
-
----
-
-<img src="docs/images/terminal-demo.svg" alt="development-skills in action" width="640"/>
-
-## What It Does
-
-AI agents are fast but undisciplined — [67% of developers](https://addyo.substack.com/p/the-80-problem-in-agentic-coding) spend *more* time debugging AI-generated code than writing it. This plugin enforces a mandatory gated workflow: research before planning, plan before coding, test before shipping, review before merging. Every time.
-
-Each session starts with a short development loop: read the project's standards, settle open decisions, make the smallest useful change, verify it, and report what wasn't checked. A small task goes straight to the edit and the check. Work that needs a lasting record gets a plan and a chronicle. A read-only **Staff Reviewer** agent reviews code on request.
-
----
-
-## Plans and Chronicles
-
-Work that needs a lasting record produces files on disk. Context windows get compacted. These files don't.
-
-**Plan files** (`docs/plans/2026-03-15__auth-refactor.md`) are the single source of truth for a task. They record the steps and verification results. When the context window clears, the agent picks up where it left off by reading the plan.
-
-**Chronicles** (`docs/chronicles/2026-03-15__auth-refactor.md`) capture what code and plans don't — **WHY**. The user's original request, the business context behind it, rejected alternatives, discoveries made during implementation. Without chronicles, a conversation with Claude disappears when the session ends. With chronicles, the reasoning survives: why cursor-based pagination instead of offset, why the auth middleware was rewritten, why a simpler approach was rejected.
-
-```
-Code + Git    →  WHAT changed    (diffs)
-Plan files    →  HOW it was built (steps, checklist, verification)
-Chronicles    →  WHY it happened  (intent, context, decisions)
+```bash
+codex plugin marketplace add salvob41/development-skills
 ```
 
-Full details on templates and lifecycle in the **[in-depth guide](docs/GUIDE.md)**.
+### Other agents
 
----
+This needs Node.js 22.20 or newer:
 
-## Skill Highlights
+```bash
+npx skills add salvob41/development-skills
+```
 
-This section highlights commonly used skills in the `development-skills` plugin and is not an exhaustive inventory.
+Skills installed this way don't include:
 
-**Workflow** — `using-development-skills` (auto-activates), `brainstorming`, `debugging`, `chronicles`
+- **Automatic start.** No hook loads the development loop, so add this line to your project's `AGENTS.md`. It's less reliable than a hook:
 
-**Languages** — `python-dev`, `java-dev`, `typescript-dev`, `frontend-dev`, `swift-dev`
+  ```markdown
+  Before any coding task, read and follow the `using-development-skills` skill.
+  ```
 
-**Testing** — `create-test`, `eval-regression`
+- **Auto-format.** Run your formatter yourself, or ask the agent to.
+- **Subagents.** Reviews run in the same conversation unless your agent has its own subagents.
 
-**Utilities** — `commit`, `simplify-stuff`, `align-docs`, `create-skills`, `get-api-docs`, `update-precommit`, `update-reqs` (use `requirements-dev.in` for dev deps)
+Skills with Claude-only tool names include a mapping in `references/tool-names.md`. Six skills that start only on request carry that instruction as text, and an agent could still ignore it.
 
-Auto-format on save via hooks: ruff (Python), biome (JS/TS), google-java-format, swift-format, prettier.
+## Plugins
 
-Full details in the **[in-depth guide](docs/GUIDE.md)**.
+| Plugin | What it adds |
+|--------|--------------|
+| `development-skills` | The development loop, 32 skills, a read-only staff reviewer agent, and auto-format hooks |
+| `best-practices` | Research on current best practices for a technology |
+| `resolve-merge` | Systematic merge conflict resolution |
+| `roast-my-code` | Code review and an AI-readiness audit scored across 12 dimensions |
+| `adr` | Create, list, and update Architecture Decision Records |
+| `project-documenter` | Project documentation generated from code, DDLs, and scripts |
+| `toolbox-mcp` | PostgreSQL connections through Google's MCP Toolbox, with a read-only role by default |
 
----
+## The development loop
 
-## Acknowledgments
+Each session starts with a short loop. The agent reads the project's standards, settles open decisions, makes the smallest useful change, verifies it, and reports what it didn't check.
 
-Draws inspiration from [superpowers](https://github.com/obra/superpowers) by Jesse Vincent — spec-first brainstorming, subagent-per-task dispatch with two-stage review, bite-sized TDD plans, and git worktree isolation.
+A small task goes straight to the edit and the check. Work that needs a lasting record also produces two files:
 
-Where development-skills diverges: **language-specific engineering patterns** (5 languages with framework-level guidance), **context engineering** (observation masking, progressive phase loading), and a **chronicles** layer for capturing WHY decisions were made.
+- `docs/plans/<date>__<task>.md` records the steps and verification results, so the agent can resume after the context clears.
+- `docs/chronicles/<date>__<task>.md` records why the work happened: the request, the context, and the rejected alternatives.
 
----
+See the [in-depth guide](docs/GUIDE.md) for templates and details.
 
-## Further Reading
+## Generated skills
 
-- [How I Taught Agents to Follow a Process, Not Just Write Code](https://medium.com/@silvio.pavanetto/how-i-taught-agents-to-follow-a-process-not-just-write-code-b135b6573c54) — the full story
-- [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — the patterns we implement
-- [TDD, AI Agents and Coding with Kent Beck](https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent) — why testing matters more with AI
+`skills/` holds a copy of every skill for the `npx skills` install. Each one includes the shared files it links to, and uses only the frontmatter fields in the standard. Edit the sources under `plugins/`, not `skills/`:
 
----
+```bash
+make portable-skills        # rebuild skills/
+make check-portable-skills  # fail if skills/ is out of date
+```
+
+## Syncing from upstream
+
+Sync is one-way, from upstream to this repo. Never push or open PRs upstream, and never run `git merge upstream/main`, because the histories are unrelated.
+
+```bash
+make setup          # run once per machine, and rerun to update ponytail and unslop
+make sync-upstream  # then review with git diff, and run make portable-skills
+```
+
+`make sync-upstream` adds new skills and updates those without local edits. It keeps a skill edited both here and upstream, and reports it. It never touches skills listed in `scripts/upstream-skip`. `scripts/upstream-base` records the last synced commit.
 
 ## Contributing
 
-Contributions welcome — especially new language skills (Rust, Go, Kotlin, Ruby, C#). See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-No PR without a passing `/eval-regression`. Open an issue first.
-
-## Fork Maintenance
-
-This fork deliberately diverges from `reidemeister94/development-skills` and keeps the `plugins/` layout. Sync is one-way, upstream to here:
-
-- Never open PRs or push to upstream.
-- Never run `git merge upstream/main`: the histories are unrelated and the layouts differ.
-- Sync skills with `make sync-upstream`, which adds new skills and updates those without local edits. Skills listed in `scripts/upstream-skip` are never touched, and `scripts/upstream-base` records the last synced commit.
-
-Run on each machine after cloning. It symlinks `global/CLAUDE.md`, downloads the skills listed in `global/skills.txt` from their authors, and makes the `upstream` remote fetch-only. Rerun it to update those skills:
-
-```bash
-make setup
-```
-
-To bring in upstream skills, keeping the `plugins/` layout:
-
-```bash
-make sync-upstream
-git diff
-```
-
-This adds new skills and updates those without local edits. A skill edited both here and upstream is kept and reported. Add a skill to `scripts/upstream-skip` to keep your version permanently.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-MIT
+MIT. The original work is by [reidemeister94](https://github.com/reidemeister94), and it draws on [superpowers](https://github.com/obra/superpowers) by Jesse Vincent.
