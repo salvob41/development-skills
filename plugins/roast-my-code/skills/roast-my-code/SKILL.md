@@ -42,7 +42,7 @@ Build the target description based on scope:
 - **Directory:** `"Standalone review. Target: all source files in <directory> and subdirectories. Also check interactions with the rest of the repo."`
 - **File:** `"Standalone review. Target: the file <filepath>. Also read files that import or are imported by it."`
 
-The staff-reviewer will detect standalone mode from the absence of task/plan/diff inputs and skip spec compliance (Stage 1), going straight to code quality (Stage 2) with its full checklist.
+The staff-reviewer treats a request with no plan or requirement as a standalone review: it skips the specification check and reports quality findings by severity.
 
 Collect the staff-reviewer's output.
 

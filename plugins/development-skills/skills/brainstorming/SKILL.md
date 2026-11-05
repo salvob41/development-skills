@@ -1,123 +1,50 @@
 ---
 name: brainstorming
-description: "Use when multiple valid approaches exist, the wrong choice is costly to reverse, or the WHY behind a request matters."
+description: "Use when the user wants to brainstorm, choose an approach, design something, or clarify an ambiguous or consequential change."
 user-invocable: true
-allowed-tools: Glob, Read, Edit, Task, Skill
+allowed-tools: Glob, Grep, Read, Bash, Task, AskUserQuestion, Skill
 ---
 
-# Brainstorming — Orchestrator
+# Brainstorming
 
-You delegate ALL analysis to an isolated subagent. You do NOT analyze, research, or read code yourself.
+Interview until you and the user share the same understanding.
+Walk every branch of the decision tree and resolve dependent decisions in order.
+Attach a recommended answer and its trade-off to every question.
+Group only independent questions, as the [development loop](../../shared/development-loop.md) Reach agreement section requires.
+The number of questions follows the ambiguity: stop when every branch is settled, not at a fixed count.
+This rule applies on every path, whether or not the task needs a plan and chronicle.
 
-## TASK CONTEXT
+<HARD-GATE>
+Do not write code before the presented design or plan is approved.
+Do not write the plan while purpose, scope, solved state, proof, or a contested design remains unresolved.
+Once these points are settled, return them to the development loop.
+The loop presents the complete design or plan before asking for approval.
+Do not ask for separate approval before the plan.
 
-**Your task:** $ARGUMENTS
+If the user asks for no questions, remove ceremony but keep open decisions.
+Present the open decisions with recommendations in one pass instead of choosing silently.
+</HARD-GATE>
 
-If `$ARGUMENTS` is empty: Display "What would you like me to analyze?" Then STOP.
+## Who decides what
 
----
+- **Facts**: inspect the filesystem, tools, and code. Never ask for discoverable facts.
+- **Required outcomes and business trade-offs**: ask the user and apply the answer.
+- **Implementation**: recommend and defend an approach with evidence.
 
-## STEP 1: LAUNCH ANALYSIS SUBAGENT
+The [development loop](../../shared/development-loop.md) Design authority section owns the remaining boundaries.
 
-1. Glob `**/brainstorming/analysis-agent.md` (fallback: `~/.claude/plugins/`)
-2. Read it. Note the directory (= skill directory).
-3. Replace `{TASK}` with complete task context and `{SKILL_DIR}` with directory path
-4. Spawn an analysis subagent using the host's subagent/delegation tool.
-   - In Codex, use `spawn_agent`.
-   - In Claude Code, use the Task tool.
-   - Give the subagent the complete task context and the resolved skill directory.
+## Interview for the design
 
-**Do NOT analyze yourself. Do NOT follow the agent's instructions.**
+Judge data shape against the [engineering contract](../../shared/engineering.md).
+Use concrete cases to expose conflicting meanings and missing boundaries.
+Cover errors, edge cases, and assumptions that would invalidate the solution.
+Settle the [definition of done](../create-test/SKILL.md#definition-of-done), including the oracle and verification limits.
+When important behavior needs a regression gate, design it before dependent work starts.
 
----
+Offer genuinely different alternatives and recommend the simplest one that meets the constraints.
+Use `best-practices` when current evidence can change the choice.
+Persist research only when it remains useful after the task.
 
-## STEP 2: DISPLAY RESULTS
-
-### `BRAINSTORM_RESULT::PASS_THROUGH`:
-
-> **Brainstorming: PASS THROUGH** — Task does not require analysis.
-> **USER CHOICE: PASS_THROUGH**
-
-STOP.
-
-### `BRAINSTORM_RESULT::NEEDS_CLARIFICATION`:
-
-Display questions. STOP. Wait for answers. Re-spawn with original context + answers.
-
-### `BRAINSTORM_RESULT::COMPLETE`:
-
-Extract PLAN_PATH, RESEARCH_PATH, VERDICT, APPROACH, COMPLEXITY, summary.
-
-> **Brainstorming complete.**
-> **Plan:** `[PLAN_PATH]` | **Research:** `[RESEARCH_PATH]`
->
-> [Summary]
-
-If verdict is **STOP**: **WARNING: Critical evaluation recommends STOP.** [Reason]
-
-**STOP your response. End your turn.** Do NOT proceed to Step 3 in the same response.
-
-### Malformed output:
-
-Display and note "unexpected format."
-
-### Error or timeout:
-
-1. Check `docs/plans/` for partial results
-2. Partial plan → present with "agent failed mid-analysis"
-3. Nothing → report failure, offer: retry / proceed without / abandon
-
----
-
-## STEP 3: APPROACH SELECTION — HARD GATE
-
-**Anti-rationalization:** If thinking "analysis is clear, I can proceed" — STOP. User MUST confirm.
-
-### 3a: Clarifying Questions
-
-If genuine uncertainty from analysis, display and STOP. Otherwise skip to 3b.
-
-### 3b: Present Options (MANDATORY)
-
-```
-Which approach do you want to go with?
-
-1. [Approach A] (Recommended) — [summary + trade-off]
-2. [Approach B] — [summary + trade-off]
-N-1. Modify something
-N. Just the analysis — don't start implementation
-```
-
-**Do NOT use AskUserQuestion. STOP. Wait.**
-
-### 3c: Handle Response
-
-- **Approach selected:** → Step 4
-- **Modify:** Ask what. Simple → edit plan, return to 3b. Fundamental → re-launch agent. After 3 cycles, suggest proceeding.
-- **Just analysis:** Announce plan saved. STOP.
-
----
-
-## STEP 4: SAVE AND ROUTE
-
-### 4a: Save
-
-Append to plan file at `[PLAN_PATH]`:
-
-```markdown
-## Approach Decision
-
-**Selected:** [name]
-**User modifications:** [None / changes]
-**Confirmed:** [YYYY-MM-DD]
-```
-
-### 4b: Route
-
-> **Approach confirmed: [name].** Starting development workflow.
-
-Invoke `development-skills:core-dev` via the host's skill mechanism with no args so Step 1 detects the active plan.
-
-### 4c: Abandon
-
-Edit `Status: In Progress` → `Status: Abandoned` in plan file. STOP.
+If `$ARGUMENTS` is empty, ask what to explore and stop.
+Use `AskUserQuestion` for decisions when that tool is available and permitted.
+When finished, return to the development loop if you were already there.

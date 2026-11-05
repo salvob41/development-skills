@@ -8,7 +8,7 @@ Open-source Claude Code plugin marketplace. Contains 7 independently installable
 
 ```
 plugins/                          # Claude Code plugins (each independently installable)
-  development-skills/             # Dev workflow: 33 skills, 3 subagents, 7-phase gates
+  development-skills/             # Dev workflow: 32 skills, 1 subagent, development loop
   best-practices/                 # Research best practices with authority verification
   resolve-merge/                  # Systematic merge conflict resolution
   roast-my-code/                  # Code review + AI-readiness audit
@@ -19,7 +19,7 @@ docs/                             # Documentation
   claude-code-reference/          # Official Claude Code reference docs
 global/                           # Personal global CLAUDE.md, skill links + per-machine installer
 scripts/                          # One-way upstream skill sync
-.claude-plugin/plugin.json        # Plugin metadata + version (v0.1.0)
+.claude-plugin/plugin.json        # Plugin metadata + version (v0.2.0)
 .claude-plugin/marketplace.json   # Marketplace config (7 plugins)
 VERSION                           # Project version
 LICENSE                           # MIT

@@ -33,23 +33,17 @@ The packaged structure is available to Codex, but some skill bodies still contai
 
 AI agents are fast but undisciplined — [67% of developers](https://addyo.substack.com/p/the-80-problem-in-agentic-coding) spend *more* time debugging AI-generated code than writing it. This plugin enforces a mandatory gated workflow: research before planning, plan before coding, test before shipping, review before merging. Every time.
 
-<img src="docs/images/workflow-phases.svg" alt="7-Phase Development Workflow" width="640"/>
-
-Three subagents handle specialized work: an **Implementer** (TDD cycles), a **Test Verifier** (structured pass/fail), and a **Staff Reviewer** (two-stage code review). The orchestrator delegates but never implements directly.
-
-<img src="docs/images/subagent-architecture.svg" alt="Subagent Architecture" width="640"/>
-
-Small tasks (3 files or fewer, single obvious approach) get a fast track — same quality checks, no ceremony.
+Each session starts with a short development loop: read the project's standards, settle open decisions, make the smallest useful change, verify it, and report what wasn't checked. A small task goes straight to the edit and the check. Work that needs a lasting record gets a plan and a chronicle. A read-only **Staff Reviewer** agent reviews code on request.
 
 ---
 
 ## Plans and Chronicles
 
-Every task produces persistent artifacts on disk, numbered incrementally like SQL migrations (`0001`, `0002`, ...). Context windows get compacted. These files don't.
+Work that needs a lasting record produces files on disk. Context windows get compacted. These files don't.
 
-**Plan files** (`docs/plans/0042__2026-03-15__implementation_plan__auth-refactor.md`) are the single source of truth for a task. They accumulate across phases: research notes, implementation checklist, verification results, review log. Subagents read from and write to the same plan file. When the context window clears, the agent picks up where it left off by reading the plan.
+**Plan files** (`docs/plans/2026-03-15__auth-refactor.md`) are the single source of truth for a task. They record the steps and verification results. When the context window clears, the agent picks up where it left off by reading the plan.
 
-**Chronicles** (`docs/chronicles/0042__2026-03-15__auth-refactor.md`) capture what code and plans don't — **WHY**. The user's original request, the business context behind it, rejected alternatives, discoveries made during implementation. Without chronicles, a conversation with Claude disappears when the session ends. With chronicles, the reasoning survives: why cursor-based pagination instead of offset, why the auth middleware was rewritten, why a simpler approach was rejected.
+**Chronicles** (`docs/chronicles/2026-03-15__auth-refactor.md`) capture what code and plans don't — **WHY**. The user's original request, the business context behind it, rejected alternatives, discoveries made during implementation. Without chronicles, a conversation with Claude disappears when the session ends. With chronicles, the reasoning survives: why cursor-based pagination instead of offset, why the auth middleware was rewritten, why a simpler approach was rejected.
 
 ```
 Code + Git    →  WHAT changed    (diffs)
@@ -65,13 +59,13 @@ Full details on templates and lifecycle in the **[in-depth guide](docs/GUIDE.md)
 
 This section highlights commonly used skills in the `development-skills` plugin and is not an exhaustive inventory.
 
-**Workflow** — `core-dev` (auto-activates), `brainstorming`, `debugging`, `chronicles`
+**Workflow** — `using-development-skills` (auto-activates), `brainstorming`, `debugging`, `chronicles`
 
 **Languages** — `python-dev`, `java-dev`, `typescript-dev`, `frontend-dev`, `swift-dev`
 
 **Testing** — `create-test`, `eval-regression`
 
-**Utilities** — `commit`, `distill`, `align-docs`, `create-skills`, `get-api-docs`, `update-precommit`, `update-reqs` (use `requirements-dev.in` for dev deps)
+**Utilities** — `commit`, `simplify-stuff`, `align-docs`, `create-skills`, `get-api-docs`, `update-precommit`, `update-reqs` (use `requirements-dev.in` for dev deps)
 
 Auto-format on save via hooks: ruff (Python), biome (JS/TS), google-java-format, swift-format, prettier.
 

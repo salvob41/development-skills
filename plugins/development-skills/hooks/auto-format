@@ -1,23 +1,35 @@
 #!/usr/bin/env bash
-# PostToolUse hook: auto-format the edited file using the best formatter per language.
-# Exits 0 silently if no formatter is found — never blocks the workflow.
-#
-# Formatters (chosen for speed + community adoption, 2026):
-#   Python:     ruff        — 30x faster than Black, used by Django/FastAPI/pandas/pydantic
-#   JS/TS:      biome       — 7-100x faster than Prettier, Rust-based, linter+formatter
-#   Java:       google-java-format — standard standalone CLI formatter
-#   Kotlin:     ktfmt       — 40% faster than ktlint, adopted by Square/Block
-#   Swift:      swift-format — official Apple toolchain (Xcode 16+)
-#   Web files:  biome       — same binary handles JSON, CSS, GraphQL
+# Best-effort PostToolUse formatting for changed files; repository verification remains authoritative.
+# Claude edit tools expose one file path. Codex apply_patch embeds multiple paths in escaped patch text,
+# so that branch uses Python only to decode and extract add/update headers.
 
-# Read hook input JSON, extract file_path from tool_input
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//;s/"$//' || true)
+paths=()
 
-[ -z "$FILE_PATH" ] && exit 0
-[ ! -f "$FILE_PATH" ] && exit 0
+# Claude Code edit tools carry a single file_path — extract it without spawning
+# a process. Paths never contain a double-quote, so [^"]* is exact.
+file_path_re='"file_path"[[:space:]]*:[[:space:]]*"([^"]*)"'
+if [[ "$INPUT" =~ $file_path_re ]]; then
+  paths+=("${BASH_REMATCH[1]}")
+elif [[ "$INPUT" == *'*** '* ]]; then
+  # Codex apply_patch only. python3 un-escapes the JSON, then MULTILINE matches
+  # each header in the now-real-newline command string.
+  while IFS= read -r p; do
+    [ -n "$p" ] && paths+=("$p")
+  done < <(printf '%s' "$INPUT" | python3 -c 'import json,re,sys
+try:
+    cmd = (json.load(sys.stdin).get("tool_input") or {}).get("command") or ""
+except Exception:
+    sys.exit(0)
+seen = set()
+for m in re.finditer(r"^\*\*\* (?:Add|Update) File:\s*(.+)$", cmd, re.MULTILINE):
+    p = m.group(1).strip()
+    if p and p not in seen:
+        seen.add(p)
+        print(p)' 2>/dev/null)
+fi
 
-EXT="${FILE_PATH##*.}"
+[ ${#paths[@]} -eq 0 ] && exit 0
 
 # Find a command in PATH or node_modules/.bin/
 find_cmd() {
@@ -26,50 +38,57 @@ find_cmd() {
   return 1
 }
 
-# Ruff has many possible install locations
+# Locate ruff without assuming any one Python env manager.
+# PATH covers every *activated* env — conda, venv, uv, pyenv, poetry, system —
+# since they all put ruff on PATH. The fallbacks cover the common *non-activated*
+# layouts: $VIRTUAL_ENV (venv/uv/virtualenv/poetry/pdm), $CONDA_PREFIX (conda/
+# mamba/micromamba), a project-local .venv|venv, and tool installs in ~/.local/bin
+# (pipx, `uv tool`, `pip --user`). Not exhaustive — any other manager still works
+# as long as ruff is reachable on PATH.
 find_ruff() {
   command -v ruff 2>/dev/null && return
   for c in "${VIRTUAL_ENV:-_}/bin/ruff" "${CONDA_PREFIX:-_}/bin/ruff" \
-           ".venv/bin/ruff" "venv/bin/ruff" "${HOME}/.local/bin/ruff" \
-           "${HOME}/.cargo/bin/ruff" "${PYENV_ROOT:-${HOME}/.pyenv}/shims/ruff"; do
-    [ -x "$c" ] 2>/dev/null && echo "$c" && return
+           .venv/bin/ruff venv/bin/ruff "${HOME}/.local/bin/ruff"; do
+    [ -x "$c" ] && echo "$c" && return
   done
   return 1
 }
 
-case "$EXT" in
-  py)
-    # Python: ruff (best-in-class, 30x faster than Black)
-    RUFF=$(find_ruff) && "$RUFF" format --quiet "$FILE_PATH" 2>/dev/null || true
-    ;;
-  ts|tsx|js|jsx|mjs|cjs)
-    # JS/TS: biome (best), then prettier (fallback)
-    FMT=$(find_cmd biome) && "$FMT" format --write "$FILE_PATH" 2>/dev/null ||
-    FMT=$(find_cmd prettier) && "$FMT" --write --log-level error "$FILE_PATH" 2>/dev/null || true
-    ;;
-  java)
-    # Java: google-java-format (standard standalone CLI)
-    command -v google-java-format &>/dev/null && google-java-format --replace "$FILE_PATH" 2>/dev/null || true
-    ;;
-  kt|kts)
-    # Kotlin: ktfmt (best, 40% faster than ktlint), then ktlint (fallback)
-    command -v ktfmt &>/dev/null && ktfmt "$FILE_PATH" 2>/dev/null ||
-    command -v ktlint &>/dev/null && ktlint --format "$FILE_PATH" 2>/dev/null || true
-    ;;
-  swift)
-    # Swift: swift-format (official Apple toolchain), then swiftformat (community)
-    command -v swift-format &>/dev/null && swift-format format --in-place "$FILE_PATH" 2>/dev/null ||
-    command -v swiftformat &>/dev/null && swiftformat "$FILE_PATH" 2>/dev/null || true
-    ;;
-  css|scss|less|graphql|json|jsonc)
-    # Web assets: biome (best for CSS/JSON/GraphQL), then prettier (fallback)
-    FMT=$(find_cmd biome) && "$FMT" format --write "$FILE_PATH" 2>/dev/null ||
-    FMT=$(find_cmd prettier) && "$FMT" --write --log-level error "$FILE_PATH" 2>/dev/null || true
-    ;;
-  html|vue|svelte|yaml|yml)
-    # HTML/YAML/templates: prettier (biome YAML/HTML support still maturing)
-    FMT=$(find_cmd prettier) && "$FMT" --write --log-level error "$FILE_PATH" 2>/dev/null || true
-    ;;
-esac
+format_file() {
+  local FILE_PATH="$1"
+  [ ! -f "$FILE_PATH" ] && return 0
+  local EXT="${FILE_PATH##*.}"
+  case "$EXT" in
+    py)
+      RUFF=$(find_ruff) && "$RUFF" format --quiet "$FILE_PATH" 2>/dev/null || true
+      ;;
+    ts|tsx|js|jsx|mjs|cjs)
+      FMT=$(find_cmd biome) && "$FMT" format --write "$FILE_PATH" 2>/dev/null ||
+      FMT=$(find_cmd prettier) && "$FMT" --write --log-level error "$FILE_PATH" 2>/dev/null || true
+      ;;
+    java)
+      command -v google-java-format &>/dev/null && google-java-format --replace "$FILE_PATH" 2>/dev/null || true
+      ;;
+    kt|kts)
+      command -v ktfmt &>/dev/null && ktfmt "$FILE_PATH" 2>/dev/null ||
+      command -v ktlint &>/dev/null && ktlint --format "$FILE_PATH" 2>/dev/null || true
+      ;;
+    swift)
+      command -v swift-format &>/dev/null && swift-format format --in-place "$FILE_PATH" 2>/dev/null ||
+      command -v swiftformat &>/dev/null && swiftformat "$FILE_PATH" 2>/dev/null || true
+      ;;
+    css|scss|less|graphql|json|jsonc)
+      FMT=$(find_cmd biome) && "$FMT" format --write "$FILE_PATH" 2>/dev/null ||
+      FMT=$(find_cmd prettier) && "$FMT" --write --log-level error "$FILE_PATH" 2>/dev/null || true
+      ;;
+    html|vue|svelte|yaml|yml)
+      FMT=$(find_cmd prettier) && "$FMT" --write --log-level error "$FILE_PATH" 2>/dev/null || true
+      ;;
+  esac
+}
+
+for FILE_PATH in "${paths[@]}"; do
+  format_file "$FILE_PATH"
+done
 
 exit 0

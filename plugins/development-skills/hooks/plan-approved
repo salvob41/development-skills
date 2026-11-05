@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Re-anchor Claude Code implementation at the native Plan mode handoff.
+
+set -euo pipefail
+
+cat <<'JSON'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse",
+    "additionalContext": "The plan is approved. Continue the authorized work without another workflow approval. If the task needs the full path, save or update its repository plan and chronicle before implementation. Continue through Implement, Verify, Review, Explain diff, and Align docs as the shared development loop requires."
+  }
+}
+JSON

@@ -7,41 +7,33 @@ allowed-tools: Glob, Read, Grep, Bash, Task, Skill, Edit, Write, EnterPlanMode
 
 # Python Development
 
-**Announce:** "I'm using the python-dev skill. Following the mandatory 7-phase workflow."
+**Announce:** "I'm using the python-dev skill."
 
-## MANDATORY: Read and Follow the Shared Workflow
-
-**You MUST read [workflow.md](../../shared/workflow.md) NOW** and follow ALL 7 phases defined there. The sections below provide Python-specific inputs for each phase.
-
-Read [patterns.md](patterns.md) during Phase 1.
-
-**If you lost workflow.md from context:** Re-read `../../shared/workflow.md` NOW before continuing.
+Follow the [development loop](../../shared/development-loop.md). Read [patterns.md](patterns.md) before changing code.
 
 ---
 
 ## Python-Specific Configuration
 
-### Verification Commands (Phase 2 + Phase 5)
+### Verification Commands
 
-WORKFLOW STATE Verification line: `pytest, ruff check, ruff format --check`
-
-**Phase 5 Tier A commands:**
+**Commands:**
 - `pytest` — run tests
 - `ruff check` — linting
 - `ruff format --check` — formatting
 - Coverage target: 70-80%
 
-**Phase 5 Tier B additional MCP verifications:**
+**If available, also verify with MCP:**
 - PostgreSQL MCP → Query DB state before/after
 - Legacy DB MCP → Query legacy databases for data verification
 
-### Implementation Rules (Phase 4)
+### Implementation Rules
 
 - **Model structure** — Pydantic CRUD variants per entity (Base/Create/Update/Read), domain-driven `schemas.py`, AppBaseModel with ConfigDict, composition over deep inheritance
 - **Minimize complexity** — generators for large data, dict lookups over list scans
 - **Preserve compatibility** — Aliases for renamed fields, defaults for new fields, preserve public signatures, re-export moved symbols
 
-### Staff Review Configuration (Phase 6)
+### Staff Review Configuration
 
 - **Patterns file path:** Path to this skill's `patterns.md`
 
@@ -58,7 +50,7 @@ WORKFLOW STATE Verification line: `pytest, ruff check, ruff format --check`
 
 ## Quality Checklist (Python-Specific)
 
-Add these to the shared workflow's verification checklist:
+Check these before reporting the work as done:
 
 - [ ] Type hints use built-in types (not `typing.List`, `typing.Dict`)
 - [ ] Pydantic for all structured data

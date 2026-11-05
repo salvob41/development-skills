@@ -7,41 +7,33 @@ allowed-tools: Glob, Read, Grep, Bash, Task, Skill, Edit, Write, EnterPlanMode
 
 # Swift Development
 
-**Announce:** "I'm using the swift-dev skill. Following the mandatory 7-phase workflow."
+**Announce:** "I'm using the swift-dev skill."
 
-## MANDATORY: Read and Follow the Shared Workflow
-
-**You MUST read [workflow.md](../../shared/workflow.md) NOW** and follow ALL 7 phases defined there. The sections below provide Swift-specific inputs for each phase.
-
-Read [patterns.md](patterns.md) during Phase 1.
-
-**If you lost workflow.md from context:** Re-read `../../shared/workflow.md` NOW before continuing.
+Follow the [development loop](../../shared/development-loop.md). Read [patterns.md](patterns.md) before changing code.
 
 ---
 
 ## Swift-Specific Configuration
 
-### Verification Commands (Phase 2 + Phase 5)
+### Verification Commands
 
-WORKFLOW STATE Verification line: `swift build, swift test, swiftlint`
-
-**Phase 5 Tier A — SPM projects:**
+**SPM projects:**
 - `swift build` — compilation
 - `swift test` — tests
 - `swiftlint` — linting (if configured)
 - Coverage target: 70-80%
 
-**Phase 5 Tier C — Xcode projects:**
+**Xcode projects:**
 - `xcodebuild build` or `xcodebuild test`
 - SwiftUI: `xcodebuild build -scheme [scheme] -destination 'platform=iOS Simulator,name=iPhone 16'`
 
-### Implementation Rules (Phase 4)
+### Implementation Rules
 
 - **Model structure** — Structs with Codable CRUD variants per entity (CreateRequest/UpdateRequest/Response), domain-driven file organization, composition over deep inheritance, prefer structs over classes
 - **Minimize complexity** — lazy sequences for large collections, Dictionary lookups over array scans
 - **Preserve compatibility** — CodingKeys for renamed fields, default values for new properties, preserve public API signatures, @available for deprecations
 
-### Staff Review Configuration (Phase 6)
+### Staff Review Configuration
 
 - **Patterns file path:** Path to this skill's `patterns.md`
 
@@ -57,7 +49,7 @@ WORKFLOW STATE Verification line: `swift build, swift test, swiftlint`
 
 ## Quality Checklist (Swift-Specific)
 
-Add these to the shared workflow's verification checklist:
+Check these before reporting the work as done:
 
 - [ ] Using Swift 5.9+ / Swift 6 features where appropriate
 - [ ] Structs preferred over classes (value semantics by default)
