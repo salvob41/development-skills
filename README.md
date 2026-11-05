@@ -103,6 +103,12 @@ No PR without a passing `/eval-regression`. Open an issue first.
 
 ## Fork Maintenance
 
+This fork deliberately diverges from `reidemeister94/development-skills` and keeps the `plugins/` layout. Sync is one-way, upstream to here:
+
+- Never open PRs or push to upstream.
+- Never run `git merge upstream/main`: the histories are unrelated and the layouts differ.
+- Sync skills with `make sync-upstream`, which adds new skills and updates those without local edits. Skills listed in `scripts/upstream-skip` are never touched, and `scripts/upstream-base` records the last synced commit.
+
 Run on each machine after cloning. It symlinks `global/CLAUDE.md`, downloads the skills listed in `global/skills.txt` from their authors, and makes the `upstream` remote fetch-only. Rerun it to update those skills:
 
 ```bash
