@@ -7,7 +7,7 @@ assignees: ''
 ---
 
 **Skill/Phase affected**
-Which skill or workflow phase? (e.g., `brainstorming`, `phase-4-implement`, `staff-reviewer`)
+Which skill or workflow phase? (e.g., `brainstorming`, `staff-reviewer`)
 
 **What happened**
 A clear description of the unexpected behavior.

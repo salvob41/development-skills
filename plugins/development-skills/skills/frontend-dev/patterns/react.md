@@ -6,7 +6,7 @@ Shared React patterns for all React-based projects (standalone, Vite, Raycast, N
 
 ## Review Standards
 
-Enforce these during Staff Engineer Review (Phase 6):
+Enforce these during Staff Engineer Review:
 
 - Hooks follow Rules of Hooks (no conditional hooks, no hooks in loops)
 - Components decomposed (< 70 lines each, single responsibility)

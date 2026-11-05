@@ -55,8 +55,8 @@ sync_skill() {
   fi
 }
 
-# Upstream skills link to ../../shared/, which lands in the same place relative to the plugin.
-sync_shared_file() {
+# These paths are the same relative to the plugin as they are upstream.
+sync_plugin_file() {
   local file="$1" local_path="$plugin/$1"
   if [ ! -e "$local_path" ]; then
     git archive "$ref" "$file" | tar -x -C "$plugin"
@@ -71,8 +71,8 @@ sync_shared_file() {
 for path in $(git ls-tree -d --name-only "$ref" skills/); do
   sync_skill "${path#skills/}"
 done
-for file in $(git ls-tree -r --name-only "$ref" shared/); do
-  sync_shared_file "$file"
+for file in $(git ls-tree -r --name-only "$ref" shared/ hooks/ agents/ evals/); do
+  sync_plugin_file "$file"
 done
 
 git rev-parse "$ref" >"$base_file"

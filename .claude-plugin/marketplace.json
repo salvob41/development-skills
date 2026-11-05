@@ -7,8 +7,8 @@
   "plugins": [
     {
       "name": "development-skills",
-      "description": "Structured development workflow with 7-phase quality gates, subagent orchestration, and multi-language support",
-      "version": "0.1.0",
+      "description": "Development loop with persistent plans and chronicles, independent review, and multi-language conventions",
+      "version": "0.2.0",
       "source": "./plugins/development-skills"
     },
     {
@@ -26,7 +26,7 @@
     {
       "name": "roast-my-code",
       "description": "Code review and AI-readiness audit with scoring across 12 dimensions",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "source": "./plugins/roast-my-code"
     },
     {
@@ -42,7 +42,7 @@
     {
       "name": "postgres-mcp",
       "source": "./plugins/postgres-mcp",
-      "description": "PostgreSQL MCP server integration for Claude Code. Run /postgres-setup to add database connections — supports multiple databases with any name."
+      "description": "PostgreSQL MCP server integration for Claude Code. Run /postgres-setup to add database connections \u2014 supports multiple databases with any name."
     }
   ]
 }

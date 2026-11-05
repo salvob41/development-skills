@@ -1,261 +1,136 @@
-# development-skills — In-Depth Guide
-
-Everything the README doesn't cover. How things work under the hood, why they're built this way, and how to get the most out of each part.
-
+---
+type: guide
+description: Detailed guide to the development workflow, persistent records, review, and plugin skills.
 ---
 
-## The 7-Phase Workflow
+# Development Skills guide
 
-When you give Claude a development task, the plugin enforces a mandatory gated workflow. Each phase must be explicitly passed before the next begins.
+The authoritative workflow is [`shared/development-loop.md`](../plugins/development-skills/shared/development-loop.md).
+This guide explains how its parts fit together.
 
-| # | Phase | What Happens | Gate |
-|---|-------|-------------|------|
-| 0 | **Brainstorming Guard** | Evaluates scope, reversibility, approach clarity. Triggers analysis if ambiguous | Automatic |
-| 1 | **Research** | Explore the codebase and gather context | "RESEARCH COMPLETE" |
-| 2 | **Plan** | Write a plan to disk, enter plan mode | User approves the plan |
-| 3 | **Chronicle** | Document the WHY — business context, requirements, decisions | "CHRONICLE INITIATED" |
-| 4 | **Implement** | TDD cycles with dedicated implementer subagent | "SOLUTION COMPLETE" |
-| 5 | **Verify** | Dedicated test-verifier runs the full test suite | Evidence of passing |
-| 6 | **Staff Review** | Two-stage code review: spec compliance, then quality | "APPROVED" |
-| 7 | **Finalize** | Update docs, chronicle, integration options | "WORKFLOW COMPLETE" |
+## The three paths
 
-**Lightweight mode:** Tasks touching 3 files or fewer with a single obvious approach skip ceremony but keep quality checks.
-
----
-
-## Key Features
-
-### Brainstorming Guard
-
-Before coding, evaluates scope, reversibility, and approach clarity. If anything is ambiguous, spawns an isolated analysis agent. The default is to analyze; burden of proof is on *skipping*.
-
-Anti-rationalization tables counter the model's tendency to justify shortcuts. Without this guard, the agent skips analysis [~40% of the time](https://medium.com/@silvio.pavanetto/how-i-taught-agents-to-follow-a-process-not-just-write-code-b135b6573c54) on tasks that need it.
-
-### Subagent Architecture
-
-Three specialized agents:
-
-- **Staff Reviewer** (Opus) — Two-stage code review: spec compliance first, then code quality
-- **Implementer** (Sonnet) — TDD execution with anti-poisoning verification
-- **Test Verifier** (Sonnet) — Structured pass/fail report, distinguishes real tests from lint-only
-
-Mirrors Anthropic's [effective sub-agent patterns](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents). Giving agents a way to verify their own work [improves quality 2-3x](https://venturebeat.com/technology/the-creator-of-claude-code-just-revealed-his-workflow-and-developers-are).
-
-### Observation Masking
-
-Verbose tool output (80%+ of context tokens) stays on disk. Implementation logs, test output, and review criteria live in files — your main conversation stays clean for [decision-making](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents).
-
-### Filesystem Persistence
-
-Plans, chronicles, and workflow state survive context compaction. The agent resumes from any phase, even after a full context clear. Projects with persistent memory show [40% fewer errors and 55% faster completion](https://resources.anthropic.com/hubfs/2026%20Agentic%20Coding%20Trends%20Report.pdf).
-
-### Smart Parallel Implementation
-
-For 4+ independent tasks, analyzes file-touch maps and spawns parallel agents in git worktrees — but only when proven safe via dependency analysis. Naive parallelization [produced 100% unusable code](https://medium.com/@silvio.pavanetto/how-i-taught-agents-to-follow-a-process-not-just-write-code-b135b6573c54); single-agent is the safe default.
-
----
-
-## Plans and Chronicles
-
-Every task produces persistent artifacts on disk, numbered incrementally like SQL migrations.
-
-### Numbering
-
-Both plans and chronicles use a shared 4-digit zero-padded counter (`0001`, `0002`, ...) that increments per task. The plugin finds the highest existing number and adds 1. A task that gets both a plan and a chronicle shares the same prefix:
-
-```
-docs/plans/0042__research.md
-docs/plans/0042__2026-03-15__implementation_plan__auth-refactor.md
-docs/chronicles/0042__2026-03-15__auth-refactor.md
+```mermaid
+flowchart TD
+    T["Development task"] --> C{"Small, clear, and reversible?"}
+    C -->|Yes| D["Direct"]
+    C -->|No| B{"Does the work need lasting decisions or designed proof?"}
+    B -->|No| U["Bounded"]
+    B -->|Yes| F["Full"]
+    D --> D1["Inspect, edit, check, report"]
+    U --> U1["State approach, edit, verify, review when required"]
+    F --> F1["Decide and define proof"]
+    F1 --> F2["Write plan and chronicle"]
+    F2 --> A{"Plan approved?"}
+    A -->|Yes| F3["Implement, verify, review, explain, align docs"]
 ```
 
-If merging branches creates duplicate numbers, the `resolve-merge` skill renumbers automatically.
+Direct work has one forced approach and one clear check.
+Bounded work spans more surface or risk but does not need a persistent decision record.
+Full work needs durable reasons, designed proof, or safe continuation across sessions.
 
-### Plan Files
+Authentication, real data, published contracts, and migrations require at least bounded work and independent review.
 
-The single source of truth for a task. Created in Phase 2, updated through Phase 7. Sections accumulate:
+## Authorization
 
-| Phase | What gets added |
-|-------|----------------|
-| 1 | Research notes, codebase analysis |
-| 2 | Implementation steps, task checklist |
-| 3 | Chronicle reference |
-| 4 | Implementation log, file-touch map, task completion |
-| 5 | Verification results (test output) |
-| 6 | Review log (feedback + fixes) |
-| 7 | Status: Completed |
+An implementation request authorizes clear in-scope edits when no plan exists.
+A planning, review, or audit request does not authorize implementation.
 
-Subagents read from and write to the same plan file. When context compaction clears the conversation, the agent resumes by reading the plan — no progress is lost.
+When a plan exists, the agent presents it before implementation.
+The presentation explains context, changes, exact files, and checks.
+The user selects `Approve`, `Edit`, or `Cancel`.
+Approval covers the planned implementation, checks, required review fixes, explanation, and documentation alignment.
 
-Each plan also has a companion **research file** (`NNNN__research.md`) written during brainstorming: web research with sources, codebase analysis, rejected alternatives with reasoning, and reusable code patterns found.
+Protected branches, releases, tags, publishing, production changes, and destructive actions keep their own approval rules.
 
-### Chronicles
+## Full-path records
 
-Chronicles capture what code and plans don't — **WHY**.
+Full work creates paired files:
 
-A conversation with Claude disappears when the session ends. The prompts you gave, the business context behind a request, the trade-offs you discussed — gone. Chronicles preserve this:
-
-- **User requirements** — the original request, complete, not summarized
-- **Business context** — why this change matters, who asked for it, what constraint drives it
-- **Decisions and rejected alternatives** — what was considered and why it was discarded
-- **Discoveries** — unexpected findings during implementation, gotchas, patterns
-- **Project state transitions** — before and after
-
-**When a chronicle is created:**
-- New feature or architectural change
-- Complex bug fix with non-obvious root cause
-- Breaking change or multi-file refactoring
-- Significant business logic or research
-
-**When it's NOT needed** (all must apply): single-line fix, no new patterns, self-evident from diff, no business context.
-
-**Chronicle template:**
-
-```markdown
-# [Brief Title]
-
-> Chronicle: 0042__2026-03-15__auth-refactor.md
-> Status: Draft | In Progress | Completed
-
-## User Requirements (Complete)
-[FULL user communication — preserve ALL signal]
-
-## Context
-[Background, project state, technical context]
-
-## Objective (The WHY)
-[Business context, user needs, problems being solved]
-
-## Affected Areas
-| Area | Files/Modules | Impact |
-|------|---------------|--------|
-
-## Discoveries & Insights
-- **[Date]**: [Discovery or insight added during implementation]
+```text
+docs/plans/2026-09-19__cache-policy.md
+docs/chronicles/2026-09-19__cache-policy.md
 ```
 
-The chronicle is created in Phase 3, updated during Phase 4 (implementer appends discoveries), and finalized in Phase 7 (status set to Completed, "after" state filled in).
+The plan records the result, design, exact paths, work items, checks, and current step.
+The chronicle records the request, decision reasons, rejected alternatives, and useful failed approaches.
 
----
+The plan links the chronicle instead of duplicating its rationale.
+The chronicle links the plan instead of storing execution status.
+[`shared/documentation.md`](../plugins/development-skills/shared/documentation.md) defines metadata, lifecycle, and archive rules.
 
-## Context Engineering
+## Proof
 
-Implements patterns from Anthropic's [Context Engineering guide](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) and validated by [Manus](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus) across millions of production users:
+`create-test` starts from externally observable behavior.
+It prefers black-box and integration proof over mocks and internal call assertions.
 
-- **Progressive disclosure** — phase instructions loaded just-in-time, not all at once
-- **Observation masking** — verbose output on disk, condensed summaries in conversation
-- **Filesystem as extended context** — plans, chronicles, workflow state, implementation logs
-- **Clean subagent windows** — each agent gets only the context it needs
-- **Anti-rationalization tables** — keep the model honest under pressure
+New behavior normally starts with a focused failing test.
+A refactor starts with a passing characterization baseline and keeps it passing.
+A performance claim needs comparable measurements before and after the change.
+For an autonomous loop, agree on a proven regression gate and the definition of done before starting.
 
-Context is loaded progressively following Anthropic's [just-in-time pattern](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents): `workflow.md` always loaded (~120 lines), phase instructions loaded per-phase (~300 words each), language patterns loaded on-demand.
+Every report states what the evidence proves and what remains unchecked.
 
----
+## Independent review
 
-## Design Philosophy
+`staff-review` sends the diff and evidence to a clean-context `staff-reviewer`.
+The reviewer reads the change before the requirements and supplied conclusions.
 
-**Iron Rules** — enforced at every phase, not suggested:
+It returns separate verdicts:
 
-1. No positive claims without fresh verification evidence
-2. Red/Green TDD — every implementation starts with a failing test
-3. Comment the WHY, not the WHAT
-4. No commits without explicit user request
-5. Every gate must be explicitly passed
+- Specification: `MISSING`, `EXTRA`, or `CANNOT_VERIFY`.
+- Quality: findings ranked with [`shared/review-categories.md`](../plugins/development-skills/shared/review-categories.md).
 
-**Model Behavior** — maximum honesty (zero accommodation), always-on critical thinking, calibrated criticism (concrete and evidence-based), planning as 90% of the work, data-validated decisions, and persistent knowledge on disk.
+Required specification fixes and CRITICAL or HIGH quality findings block completion.
+MEDIUM and LOW findings remain visible for the author to decide.
 
----
+## Skills
 
-## Architecture
+| Skill | Purpose |
+|---|---|
+| `using-development-skills` | Route work through the development loop. |
+| `brainstorming` | Resolve consequential choices before planning. |
+| `create-test` | Design or implement regression proof. |
+| `explain-diff` | Transfer the change's behavior, reasons, and limits. |
+| `staff-review` | Run an independent specification and quality review. |
+| `roast-my-code` | Present the same factual review with aggressive humor. |
+| `refactor` | Audit first, then apply selected behavior-preserving tranches. |
+| `refactor-loop` | Refactor autonomously while preserving observable behavior. |
+| `evolve-loop` | Develop evidence-backed improvements that can change behavior. |
+| `simplify-stuff` | Remove content that carries no useful behavior or knowledge. |
+| `rethink` | Rebuild a weak proposal from first principles. |
+| `align-docs` | Repair documentation owners, routes, metadata, and lifecycle. |
+| `changelog` | Add or derive Keep a Changelog entries. |
+| `commit` | Create a requested Conventional Commit from staged changes. |
+| `handoff` | Create a temporary, self-contained session handoff. |
+| `resolve-merge` | Resolve merge or rebase conflicts safely. |
+| `wrap-up-branch` | Test, review, document, and merge a finished branch after confirmation. |
+| `best-practices` | Research current choices with primary evidence. |
+| `ai-agent-bench` | Compare Claude Code and Codex on the same code task. |
+| `eval-regression` | Check plugin routing or behavior with bounded sessions. |
+| `phone-a-friend` | Get a cross-model, read-only second opinion. |
+| `plugin-feedback` | Capture or assess evidence-backed plugin improvements. |
+| `bro` | Restate technical text in plain language. |
+| `update-deps` | Update Python dependencies or pre-commit hooks without changing pin style. |
 
-```
-skills/          19 skills (core-dev, 5 languages, brainstorming, debugging, testing, utilities)
-agents/          3 subagents (implementer, staff-reviewer, test-verifier)
-hooks/           Auto-format on Edit/Write (multi-language) + session context
-shared/          Workflow engine with just-in-time phase loading
-commands/        Feedback production/ingestion
-```
+## Hooks
 
----
+`session-start` injects the router, writing contract, development loop, and engineering contract.
+`auto-format` runs a formatter when one is available.
+`plan-approved` records that the current plan already has approval.
 
-## Auto-Format on Save
+Hooks provide convenience and context. Project checks remain authoritative.
 
-A `PostToolUse` hook automatically formats files when Claude edits them:
+## Repository layout
 
-| Language | Formatter | Fallback |
-|----------|-----------|----------|
-| Python | ruff | — |
-| JS/TS/CSS/JSON | biome | prettier |
-| Java | google-java-format | — |
-| Kotlin | ktfmt | ktlint |
-| Swift | swift-format | swiftformat |
-| HTML/YAML | prettier | — |
-
----
-
-## All Skills Reference
-
-### Development
-
-| Skill | Trigger | What It Does |
-|-------|---------|-------------|
-| `core-dev` | Auto | Workflow router — detects language, enforces brainstorming guard, dispatches |
-| `brainstorming` | `/brainstorming` | Critical evaluation with isolated analysis agent |
-| `python-dev` | `/python-dev` | Python patterns — Pydantic, FastAPI, asyncpg, pytest |
-| `java-dev` | `/java-dev` | Java patterns — Records, Streams, Spring Boot, JPA |
-| `typescript-dev` | `/typescript-dev` | TypeScript patterns — Zod, Express, Fastify, vitest |
-| `frontend-dev` | `/frontend-dev` | Auto-detects React, Next.js, Raycast, Vite |
-| `swift-dev` | `/swift-dev` | Swift patterns — SwiftUI, UIKit, Vapor, SPM |
-| `debugging` | `/debugging` | Systematic root-cause debugging |
-
-### Testing & Quality
-
-| Skill | Trigger | What It Does |
-|-------|---------|-------------|
-| `create-test` | `/create-test` | Risk-scored test design with explorer and targeted modes |
-| `eval-regression` | `/eval-regression` | Pre-commit regression testing (50 evals, 175 assertions) |
-
-### Utilities
-
-| Skill | Trigger | What It Does |
-|-------|---------|-------------|
-| `commit` | `/commit` | Conventional commits from staged changes |
-| `distill` | `/distill` | Semantic text compression with multilingual noise removal |
-| `chronicles` | Auto | Project snapshots capturing the WHY behind changes |
-| `align-docs` | `/align-docs` | Align documentation with current project state |
-| `create-skills` | `/create-skills` | Scaffold or improve skills with the current repo's conventions |
-| `get-api-docs` | `/get-api-docs <package>` | Fetch package documentation into `tmp/` for local analysis |
-| `update-precommit` | `/update-precommit` | Update pre-commit hooks to latest versions |
-| `update-reqs` | `/update-reqs` | Update requirements.in with latest PyPI versions |
-| `update-reqs` | `/update-reqs requirements-dev.in` | Update requirements-dev.in with latest PyPI versions |
-
----
-
-## Regression Testing
-
-**50 evals, 175 assertions** across 13 behavioral dimensions — a test suite for agent behavior. Powered by Anthropic's [`skill-creator`](https://github.com/anthropics/claude-plugins-official) plugin.
-
-```
-/eval-regression
+```text
+skills/       Task-specific workflows.
+agents/       The clean-context staff reviewer.
+shared/       Canonical workflow, engineering, writing, and documentation contracts.
+hooks/        Session, formatting, and approval hooks.
+evals/        Routing and behavior cases.
+scripts/      Deterministic repository checks.
 ```
 
-Covers: brainstorming guard (7), smart isolation (6), create-test routing and quality checks (16), anti-rationalization (4), anti-sycophancy (4), performance review (3), workflow phases (3), implementer discipline (2), language detection, chronicle quality, turn boundaries, project directives, and AskUserQuestion avoidance.
-
-Each eval snapshots the committed version as baseline, runs the modified version, and produces a verdict: **SAFE TO COMMIT** or **REGRESSIONS FOUND**.
-
-Requires the `skill-creator` plugin:
-
-```bash
-/plugin install skill-creator@claude-plugins-official
-```
-
----
-
-## Further Reading
-
-- [How I Taught Agents to Follow a Process, Not Just Write Code](https://medium.com/@silvio.pavanetto/how-i-taught-agents-to-follow-a-process-not-just-write-code-b135b6573c54) — the full story behind this plugin
-- [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — Anthropic's guide to the patterns we implement
-- [Building Claude Code with Boris Cherny](https://newsletter.pragmaticengineer.com/p/building-claude-code-with-boris-cherny) — how the creator thinks about agent workflows
-- [TDD, AI Agents and Coding with Kent Beck](https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent) — why testing matters more with AI
-- [Agentic Engineering](https://addyosmani.com/blog/agentic-engineering/) — Addy Osmani on structured workflows
-- [Context Engineering: Lessons from Manus](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus) — production-validated patterns
+The plugin stays language-agnostic.
+Target repositories own their language, framework, architecture, and operational conventions.

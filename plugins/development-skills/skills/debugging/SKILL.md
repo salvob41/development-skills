@@ -72,7 +72,7 @@ Random fixes waste time and create new bugs. Systematic debugging fixes correctl
 
 ## Integration with Development Workflow
 
-Enhances Phase 1 (Research) for debugging tasks. After root cause found, continue to Phase 2 (Plan) and remaining phases normally.
+After finding the root cause, continue with the [development loop](../../shared/development-loop.md).
 
 Standalone (`/debugging`): announce root cause and proposed fix, ask if user wants to proceed with dev workflow.
 

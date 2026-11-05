@@ -31,9 +31,9 @@ Chronicles = WHY it happened, USER CONTEXT, PROJECT STATE
 
 ## Usage
 
-### Within Workflow (Phase 3)
+### Within the Full Path
 
-Read `shared/phases/phase-3-chronicle.md` for template and instructions.
+Follow [full-path.md](../../shared/full-path.md) and its [chronicle template](../../shared/templates/chronicle-template.md).
 
 ### Standalone
 

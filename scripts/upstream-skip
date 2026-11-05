@@ -1,4 +1,2 @@
-brainstorming    core-dev depends on its PASS_THROUGH result and "Brainstorming Summary" plan; upstream removed both
 roast-my-code    local customizations conflict with upstream
 best-practices   local customizations conflict with upstream
-using-development-skills    second router that would compete with core-dev for all development work

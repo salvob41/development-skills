@@ -7,7 +7,7 @@ allowed-tools: Glob, Read, Grep, Bash, Task, Skill, Edit, Write, EnterPlanMode
 
 # Frontend Development
 
-**Announce:** "I'm using the frontend-dev skill. Following the mandatory 7-phase workflow."
+**Announce:** "I'm using the frontend-dev skill."
 
 ---
 
@@ -43,23 +43,15 @@ If no framework matches, ask: "I couldn't auto-detect your frontend framework. W
 
 ---
 
-## MANDATORY: Read and Follow the Shared Workflow
-
-**You MUST read [workflow.md](../../shared/workflow.md) NOW** and follow ALL 7 phases defined there. The sections below provide frontend-specific inputs for each phase.
-
-**Phase 1:** Read [patterns/typescript.md](patterns/typescript.md) FIRST (always), then ALL framework-specific pattern files identified in Framework Detection.
-
-**If you lost workflow.md from context:** Re-read `../../shared/workflow.md` NOW before continuing.
+Follow the [development loop](../../shared/development-loop.md). Before changing code, read [patterns/typescript.md](patterns/typescript.md) first (always), then ALL framework-specific pattern files identified in Framework Detection.
 
 ---
 
 ## Frontend-Specific Configuration
 
-### Verification Commands (Phase 2 + Phase 5)
+### Verification Commands
 
-WORKFLOW STATE Verification line: `npm run build, npm run lint, npm test`
-
-**Phase 5 Tier A commands** — use the commands appropriate for the detected framework:
+Use the commands appropriate for the detected framework:
 
 | Framework | Type Check | Build | Lint | Test |
 |-----------|-----------|-------|------|------|
@@ -67,13 +59,13 @@ WORKFLOW STATE Verification line: `npm run build, npm run lint, npm test`
 | React + Vite | `tsc --noEmit` | `vite build` | `eslint` | `vitest` |
 | Raycast | `ray build` | (included) | `eslint` | — |
 
-### Implementation Rules (Phase 4)
+### Implementation Rules
 
 - **Schema structure** — Zod CRUD variants per entity (CreateInput/UpdateInput/Output), domain-driven `schemas.ts`, types derived via `z.infer`, composition over deep extends chains
 - **Minimize complexity** — Map/Set lookups over array scans, avoid unnecessary re-renders
 - **Preserve compatibility** — `.transform()` for renamed fields, `.default()` for new fields, preserve exported signatures and component props
 
-### Staff Review Configuration (Phase 6)
+### Staff Review Configuration
 
 - **Detected framework:** The framework detected in the pre-step
 - **Patterns file paths:** Paths to `patterns/typescript.md` AND the framework-specific pattern file(s)
@@ -86,13 +78,13 @@ WORKFLOW STATE Verification line: `npm run build, npm run lint, npm test`
 - Framework detection MUST be explicit and stated — wrong detection = wrong patterns = wrong code
 - Each framework has specific build/type-check commands — check the verification table
 - If the framework isn't listed, ASK the user — do not guess
-- Complete framework detection BEFORE starting Phase 1
+- Complete framework detection BEFORE changing code
 
 ---
 
 ## Quality Checklist (Frontend-Specific)
 
-Add these to the shared workflow's verification checklist:
+Check these before reporting the work as done:
 
 - [ ] Framework detected and stated
 - [ ] `typescript.md` read (always)

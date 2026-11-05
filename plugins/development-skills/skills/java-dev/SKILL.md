@@ -7,40 +7,32 @@ allowed-tools: Glob, Read, Grep, Bash, Task, Skill, Edit, Write, EnterPlanMode
 
 # Java Development
 
-**Announce:** "I'm using the java-dev skill. Following the mandatory 7-phase workflow."
+**Announce:** "I'm using the java-dev skill."
 
-## MANDATORY: Read and Follow the Shared Workflow
-
-**You MUST read [workflow.md](../../shared/workflow.md) NOW** and follow ALL 7 phases defined there. The sections below provide Java-specific inputs for each phase.
-
-Read [patterns.md](patterns.md) during Phase 1.
-
-**If you lost workflow.md from context:** Re-read `../../shared/workflow.md` NOW before continuing.
+Follow the [development loop](../../shared/development-loop.md). Read [patterns.md](patterns.md) before changing code.
 
 ---
 
 ## Java-Specific Configuration
 
-### Verification Commands (Phase 2 + Phase 5)
+### Verification Commands
 
-WORKFLOW STATE Verification line: `mvn test / gradle test, mvn compile / gradle build`
-
-**Phase 5 Tier A commands:**
+**Commands:**
 - `mvn test` or `gradle test` — run tests
 - `mvn compile` or `gradle build` — compilation check
 - Check for compiler warnings
 
-**Phase 5 Tier B additional MCP verifications:**
+**If available, also verify with MCP:**
 - PostgreSQL MCP → Query DB state before/after
 - Legacy DB MCP → Query legacy databases for data verification
 
-### Implementation Rules (Phase 4)
+### Implementation Rules
 
 - **Data carrier structure** — Records with CRUD variants per entity (CreateRequest/UpdateRequest/Response), domain-driven packages, composition over deep inheritance
 - **Minimize complexity** — efficient streams, HashMap lookups over list scans
 - **Preserve compatibility** — Overloaded methods for new params, @JsonProperty for renamed fields, @Deprecated before removal
 
-### Staff Review Configuration (Phase 6)
+### Staff Review Configuration
 
 - **Patterns file path:** Path to this skill's `patterns.md`
 
@@ -56,7 +48,7 @@ WORKFLOW STATE Verification line: `mvn test / gradle test, mvn compile / gradle 
 
 ## Quality Checklist (Java-Specific)
 
-Add these to the shared workflow's verification checklist:
+Check these before reporting the work as done:
 
 - [ ] Using Java 21+ features (var, records, switch expressions, pattern matching)
 - [ ] Records used for immutable data carriers

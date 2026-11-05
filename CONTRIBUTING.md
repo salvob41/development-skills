@@ -28,95 +28,9 @@ This plugin enforces discipline on AI agents — we hold ourselves to the same s
 5. Run the regression eval suite (see below)
 6. Open a PR with the benchmark results
 
-## Regression Testing with skill-creator
+## Regression Testing
 
-The plugin ships with **50 evals and 175 assertions** covering 13 behavioral dimensions. These are the project's test suite — the equivalent of unit tests for a skill-based system.
-
-### Eval Categories
-
-| Category | Evals | What It Tests |
-|----------|-------|--------------|
-| `brainstorming-guard` | 7 | Triggers brainstorming when needed, skips when appropriate |
-| `smart-isolation` | 6 | Parallel vs single agent decisions, worktree safety |
-| `anti-rationalization` | 4 | Resists shortcuts, catches flawed premises |
-| `anti-sycophancy` | 4 | Pushes back on agreeable but weak technical directions |
-| `create-test` | 16 | Test planning, routing, DB integration, E2E, and eval generation behavior |
-| `workflow-phases` | 3 | Phase progression, resumption, plan discovery |
-| `implementer-discipline` | 2 | TDD, caller updates, verification honesty |
-| `language-detection` | 1 | Frontend vs TypeScript backend routing |
-| `performance-review` | 3 | Performance analysis and evidence standards |
-| `chronicle-quality` | 1 | WHY documentation quality |
-| `askuserquestion-avoidance` | 1 | Uses conversational text, not AskUserQuestion tool |
-| `turn-boundary` | 1 | Stops at the right moment, doesn't overflow turns |
-| `project-directives` | 1 | Respects existing project directives |
-
-### Running the Full Regression Suite
-
-Use the `/eval-regression` skill or run manually with `skill-creator`:
-
-```
-/eval-regression
-```
-
-This will:
-1. **Snapshot** the current committed version as baseline
-2. **Execute** all 50 evals against both baseline and your modified version
-3. **Grade** each eval's assertions (pass/fail with evidence)
-4. **Compare** results and generate a regression report
-5. **Verdict**: `SAFE TO COMMIT` or `REGRESSIONS FOUND`
-
-### Workspace Layout
-
-```
-plugins/
-├── development-skills/              # Your plugin (modified)
-│   └── evals/
-│       └── evals.json               # Eval definitions (50 evals, 175 assertions)
-└── development-skills-workspace/    # Created by skill-creator (gitignored)
-    ├── skill-snapshot/              # Baseline snapshot
-    └── iteration-N/
-        ├── eval-{ID}/
-        │   ├── eval_metadata.json   # {eval_id, eval_name, prompt, expectations}
-        │   └── with_skill/
-        │       ├── outputs/         # transcript.md + generated files
-        │       └── grading.json     # {expectations: [{text, passed, evidence}], summary}
-        ├── benchmark.json           # Machine-readable results
-        └── benchmark.md             # Human-readable report
-```
-
-### What the PR Must Include
-
-1. **`benchmark.md`** — paste the human-readable report in the PR description
-2. **Pass rate** — must be 100% on all existing assertions (zero regressions)
-3. **New evals** — if your change adds a skill or modifies routing, add evals that test the new behavior
-
-### Adding New Evals
-
-If your PR adds a skill or changes behavior, you must add corresponding evals to `evals/evals.json`:
-
-```json
-{
-  "id": 28,
-  "name": "your-eval-name",
-  "category": "brainstorming-guard",
-  "prompt": "The exact user prompt to test",
-  "expected_output": "What should happen (for grader context)",
-  "assertions": [
-    {
-      "description": "What this assertion checks",
-      "pass_criteria": "Specific, verifiable condition"
-    }
-  ],
-  "files": []
-}
-```
-
-**Guidelines for good evals:**
-- Test the **routing decision**, not the full implementation (evals stop after first routing)
-- Each assertion should check one specific behavior
-- `pass_criteria` must be unambiguous — a grader should be able to judge pass/fail without context
-- Use `files` array to inject context files the eval needs (plan files, project configs)
-- Choose the right `category` from the existing set
+Eval cases are in `plugins/development-skills/evals/`. Use `/eval-regression` to select and run them.
 
 ## What to Contribute
 
