@@ -40,9 +40,9 @@
       "description": "Adds a /project-documenter skill for generating project documentation"
     },
     {
-      "name": "postgres-mcp",
-      "source": "./plugins/postgres-mcp",
-      "description": "PostgreSQL MCP server integration for Claude Code. Run /postgres-setup to add database connections \u2014 supports multiple databases with any name."
+      "name": "toolbox-mcp",
+      "source": "./plugins/toolbox-mcp",
+      "description": "PostgreSQL access through Google's MCP Toolbox. Run /toolbox-setup to add database connections, with a read-only role by default."
     }
   ]
 }

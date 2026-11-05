@@ -14,7 +14,7 @@ plugins/                          # Claude Code plugins (each independently inst
   roast-my-code/                  # Code review + AI-readiness audit
   adr/                            # Architecture Decision Records
   project-documenter/             # Codebase documentation generator
-  postgres-mcp/                   # PostgreSQL MCP server integration
+  toolbox-mcp/                    # PostgreSQL access through Google's MCP Toolbox
 docs/                             # Documentation
   claude-code-reference/          # Official Claude Code reference docs
 global/                           # Personal global CLAUDE.md, skill links + per-machine installer

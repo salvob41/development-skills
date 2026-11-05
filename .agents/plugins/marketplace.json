@@ -77,10 +77,10 @@
       "category": "Documentation"
     },
     {
-      "name": "postgres-mcp",
+      "name": "toolbox-mcp",
       "source": {
         "source": "local",
-        "path": "./plugins/postgres-mcp"
+        "path": "./plugins/toolbox-mcp"
       },
       "policy": {
         "installation": "AVAILABLE",
