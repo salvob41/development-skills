@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Open-source Claude Code plugin marketplace. Contains 6 independently installable plugins for structured development workflows, architecture decisions, documentation, best practices research, merge resolution, and code auditing.
+Open-source Claude Code plugin marketplace. Contains 7 independently installable plugins for structured development workflows, architecture decisions, documentation, database integration, best practices research, merge resolution, and code auditing.
 
 ## Project Structure
 
@@ -14,12 +14,13 @@ plugins/                          # Claude Code plugins (each independently inst
   roast-my-code/                  # Code review + AI-readiness audit
   adr/                            # Architecture Decision Records
   project-documenter/             # Codebase documentation generator
+  toolbox-mcp/                    # PostgreSQL access through Google's MCP Toolbox
 docs/                             # Documentation
   claude-code-reference/          # Official Claude Code reference docs
 global/                           # Personal global CLAUDE.md, skill links + per-machine installer
 scripts/                          # One-way upstream skill sync
 .claude-plugin/plugin.json        # Plugin metadata + version (v0.2.0)
-.claude-plugin/marketplace.json   # Marketplace config (6 plugins)
+.claude-plugin/marketplace.json   # Marketplace config (7 plugins)
 VERSION                           # Project version
 LICENSE                           # MIT
 ```

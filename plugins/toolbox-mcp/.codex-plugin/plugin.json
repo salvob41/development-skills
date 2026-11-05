@@ -1,0 +1,34 @@
+{
+  "name": "toolbox-mcp",
+  "version": "1.0.0",
+  "description": "PostgreSQL access through Google's MCP Toolbox, with a setup workflow that defaults to a read-only role.",
+  "author": {
+    "name": "salvob41",
+    "url": "https://github.com/salvob41"
+  },
+  "homepage": "https://github.com/salvob41/development-skills/tree/main/plugins/toolbox-mcp",
+  "repository": "https://github.com/salvob41/development-skills",
+  "license": "MIT",
+  "keywords": [
+    "postgres",
+    "mcp",
+    "database",
+    "infrastructure"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "MCP Toolbox",
+    "shortDescription": "Set up PostgreSQL connections through MCP Toolbox",
+    "longDescription": "Adds the toolbox setup skill used to configure project-level PostgreSQL MCP connections for local agent workflows.",
+    "developerName": "salvob41",
+    "category": "Infrastructure",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/salvob41/development-skills",
+    "defaultPrompt": [
+      "Set up a PostgreSQL connection for this project with MCP Toolbox"
+    ]
+  }
+}

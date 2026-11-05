@@ -38,6 +38,11 @@
       "name": "project-documenter",
       "source": "./plugins/project-documenter",
       "description": "Adds a /project-documenter skill for generating project documentation"
+    },
+    {
+      "name": "toolbox-mcp",
+      "source": "./plugins/toolbox-mcp",
+      "description": "PostgreSQL access through Google's MCP Toolbox. Run /toolbox-setup to add database connections, with a read-only role by default."
     }
   ]
 }

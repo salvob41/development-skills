@@ -75,6 +75,18 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Documentation"
+    },
+    {
+      "name": "toolbox-mcp",
+      "source": {
+        "source": "local",
+        "path": "./plugins/toolbox-mcp"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Infrastructure"
     }
   ]
 }
