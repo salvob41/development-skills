@@ -1,6 +1,6 @@
 {
   "name": "toolbox-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "PostgreSQL access through Google's MCP Toolbox, with a setup workflow that defaults to a read-only role.",
   "author": {
     "name": "salvob41",

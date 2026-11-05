@@ -9,6 +9,13 @@ setup:
 sync-upstream:
 	./scripts/upstream-skills.sh
 
+portable-skills:
+	python3 scripts/build_portable_skills.py
+
+check-portable-skills:
+	python3 scripts/test_build_portable_skills.py
+	python3 scripts/build_portable_skills.py --check
+
 clean:
 	find . -type d -name __pycache__ -prune -exec rm -rf {} \;
 	find . -type d -name .hypothesis -prune -exec rm -rf {} \;

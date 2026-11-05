@@ -1,9 +1,9 @@
 ---
 name: toolbox-setup
-description: "Add a PostgreSQL database connection to this project using Google's MCP Toolbox. Use when asked to 'connect to PostgreSQL', 'add a database connection', 'set up the Postgres MCP', 'set up MCP Toolbox', 'configure database access for Codex or Claude', or 'I want the agent to query my database'."
+description: "Add a PostgreSQL database connection to this project using Google's MCP Toolbox. Use when asked to 'connect to PostgreSQL', 'add a database connection', 'set up the Postgres MCP', 'set up MCP Toolbox', 'configure database access for your agent', or 'I want the agent to query my database'."
 metadata:
   author: salvob41
-  version: 1.0.0
+  version: 1.1.0
   mcp-server: postgres
   category: infrastructure
 ---
@@ -19,9 +19,23 @@ Run `/toolbox-setup` again to add more databases.
 - User asks to "set up postgres", "add a database", "configure database connection", etc.
 - A postgres MCP tool fails with a connection or setup error
 
+## Config file for each agent
+
+Use the file for the agent you're running in. If you can't tell, ask. The steps below call it the config file.
+
+| Agent | Project config file |
+|---|---|
+| Claude Code | `.mcp.json` |
+| Cursor | `.cursor/mcp.json` |
+| Codex | `.codex/config.toml` (Codex only loads it for trusted projects) |
+| OpenCode | `opencode.json` |
+| Any other agent | Check that agent's MCP docs. The command, args, and env are the same |
+
 ## Setup flow
 
 ### Step 1: Check existing configuration
+
+On Claude Code, run the check below. On other agents, read the config file and look for server names starting with `postgres-`.
 
 ```bash
 cat .mcp.json 2>/dev/null | python3 -c "
@@ -48,11 +62,11 @@ if old:
 
 ```bash
 command -v toolbox || echo "MISSING_TOOLBOX"
-git check-ignore -q .mcp.json && echo "MCP_JSON_IGNORED" || echo "MCP_JSON_NOT_IGNORED"
+git check-ignore -q <CONFIG_FILE> && echo "CONFIG_IGNORED" || echo "CONFIG_NOT_IGNORED"
 ```
 
 - If MISSING_TOOLBOX, tell the user to run `brew install mcp-toolbox`, or to download the binary from the [releases page](https://github.com/googleapis/mcp-toolbox/releases) and put it on their PATH. Wait until `command -v toolbox` prints a path. Store that absolute path as TOOLBOX_PATH.
-- If MCP_JSON_NOT_IGNORED, warn the user that `.mcp.json` will hold the database password in plain text and could be committed. Recommend adding it to `.gitignore`. Don't change `.gitignore` yourself.
+- If CONFIG_NOT_IGNORED, warn the user that the config file will hold the database password in plain text and could be committed. Recommend adding it to `.gitignore`. Don't change `.gitignore` yourself.
 
 ### Step 3: Choose access
 
@@ -84,9 +98,9 @@ Ask the user for these, using the host's normal question or input mechanism:
 
 ### Step 5: Generate configuration
 
-Add this ONE server to `.mcp.json` in the project root. **Always merge. Never overwrite existing entries.**
+Add this ONE server to the config file. **Always merge. Never overwrite existing entries.**
 
-Read the existing file (or start with `{}`) and add the new server under `mcpServers`:
+Read the existing file, or start from an empty one. On Claude Code and Cursor, add the new server under `mcpServers`:
 
 ```json
 {
@@ -95,6 +109,44 @@ Read the existing file (or start with `{}`) and add the new server under `mcpSer
       "command": "<TOOLBOX_PATH>",
       "args": ["--prebuilt", "postgres", "--stdio"],
       "env": {
+        "POSTGRES_HOST": "<HOST>",
+        "POSTGRES_PORT": "<PORT>",
+        "POSTGRES_DATABASE": "<DATABASE>",
+        "POSTGRES_USER": "<USER>",
+        "POSTGRES_PASSWORD": "<PASSWORD>",
+        "POSTGRES_QUERY_PARAMS": "{\"sslmode\":\"require\"}"
+      }
+    }
+  }
+}
+```
+
+On Codex, add a table to `.codex/config.toml`:
+
+```toml
+[mcp_servers.<NAME>]
+command = "<TOOLBOX_PATH>"
+args = ["--prebuilt", "postgres", "--stdio"]
+
+[mcp_servers.<NAME>.env]
+POSTGRES_HOST = "<HOST>"
+POSTGRES_PORT = "<PORT>"
+POSTGRES_DATABASE = "<DATABASE>"
+POSTGRES_USER = "<USER>"
+POSTGRES_PASSWORD = "<PASSWORD>"
+POSTGRES_QUERY_PARAMS = '{"sslmode":"require"}'
+```
+
+On OpenCode, add the server under `mcp` in `opencode.json`:
+
+```json
+{
+  "mcp": {
+    "<NAME>": {
+      "type": "local",
+      "command": ["<TOOLBOX_PATH>", "--prebuilt", "postgres", "--stdio"],
+      "enabled": true,
+      "environment": {
         "POSTGRES_HOST": "<HOST>",
         "POSTGRES_PORT": "<PORT>",
         "POSTGRES_DATABASE": "<DATABASE>",
@@ -117,8 +169,8 @@ If the name already exists, overwrite that entry (this allows reconfiguration).
 
 Tell the user:
 
-1. "Added **<NAME>** to `.mcp.json`."
-2. "Restart your MCP host if required, then check that the server appears and is connected."
+1. "Added **<NAME>** to <CONFIG_FILE>."
+2. "Restart your agent if required, then check that the server appears and is connected."
 3. "To add another database connection, run `/toolbox-setup` again."
 
 After the restart, run this with the new server's `execute_sql` tool:
@@ -139,9 +191,9 @@ If the user chose read-only and `unsafe` is true, tell them the connection isn't
 
 If setup completed but tools still don't work:
 
-1. **Check the binary**: run `toolbox --version` and confirm `command` in `.mcp.json` points to it.
-2. **Check the startup error**: Toolbox exits at startup if it can't connect, and the error is on stderr. Use the MCP host's status view or logs.
-3. **Check `.mcp.json`**: verify the `env` values, and that `POSTGRES_QUERY_PARAMS` is a map.
+1. **Check the binary**: run `toolbox --version` and confirm the command in the config file points to it.
+2. **Check the startup error**: Toolbox exits at startup if it can't connect, and the error is on stderr. Use the agent's MCP status view or logs.
+3. **Check the config file**: verify the environment values, and that `POSTGRES_QUERY_PARAMS` is a map.
 4. **`list_query_stats` fails with `pg_stat_statements does not exist`**: the database doesn't have that extension installed. Other tools still work.
 
 ## Examples
