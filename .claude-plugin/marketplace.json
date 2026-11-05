@@ -38,11 +38,6 @@
       "name": "project-documenter",
       "source": "./plugins/project-documenter",
       "description": "Adds a /project-documenter skill for generating project documentation"
-    },
-    {
-      "name": "postgres-mcp",
-      "source": "./plugins/postgres-mcp",
-      "description": "PostgreSQL MCP server integration for Claude Code. Run /postgres-setup to add database connections \u2014 supports multiple databases with any name."
     }
   ]
 }

@@ -75,18 +75,6 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Documentation"
-    },
-    {
-      "name": "postgres-mcp",
-      "source": {
-        "source": "local",
-        "path": "./plugins/postgres-mcp"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Infrastructure"
     }
   ]
 }
