@@ -101,6 +101,23 @@ Contributions welcome — especially new language skills (Rust, Go, Kotlin, Ruby
 
 No PR without a passing `/eval-regression`. Open an issue first.
 
+## Fork Maintenance
+
+Run once on each machine after cloning. It symlinks `global/CLAUDE.md` and `global/skills/` into your Claude Code config and makes the `upstream` remote fetch-only:
+
+```bash
+make setup
+```
+
+To bring in upstream skills, keeping the `plugins/` layout:
+
+```bash
+make sync-upstream
+git diff
+```
+
+This adds new skills and updates those without local edits. A skill edited both here and upstream is kept and reported. Add a skill to `scripts/upstream-skip` to keep your version permanently.
+
 ## License
 
 MIT

@@ -1,175 +1,98 @@
 ---
 name: create-test
-description: "Use when user wants to create tests, generate test coverage, audit test quality, find untested code, or improve weak assertions. Use when user says write tests, test coverage, missing tests, or untested code."
+description: "Define or implement regression proof: test strategy, black-box or integration tests, KPIs, thresholds, audits, or missing tests."
 argument-hint: "[file-or-directory-or-goal]"
 user-invocable: true
-allowed-tools: Glob, Grep, Read, Bash, Agent, Edit, Write
+allowed-tools: Glob, Grep, Read, Bash, Edit, Write, AskUserQuestion
 ---
 
-# Create Test — Intelligent Test Design
+# Create test
 
-ultrathink
+Start with the user need or business rule that must always hold, not files, coverage, or internal calls.
+Inspect for facts; ask only for business decisions that cannot be discovered.
 
-**Announce:** "Using the create-test skill. Analyzing code to design tests that find bugs, not just exist."
+## Definition of done
 
-## Rules (apply to ALL modes)
+Agree on the observable result, the oracle that decides correctness, and exact checks before implementation.
+Record the environment, data, expected result, unchanged behavior, and limits of the checks.
+Use existing checks where they provide evidence. Ask for business rules and acceptance criteria that the evidence cannot settle.
+For a bug, reproduce the failure. For new behavior, use agreed examples and show the acceptance check fails before the change.
+For a refactor, keep the characterization baseline green before and after the change.
+Record each intended behavior difference with its reason and a concrete before and after.
 
-- **Simplicity first.** Use the simplest approach that catches the bug. Plain pytest + assert before any library. Add a dependency only when the concept cannot be expressed without it.
-- **Tests must find bugs, not just exist.** Every test must target a specific failure mode.
-- **Test through the public API.** Do not test private/internal functions directly.
-- **Strong assertions only.** Never generate `assertNotNull(x)` as sole assertion. Assert specific values, shapes, invariants.
-- **Random data over fixed data.** Prefer property-based tests over hardcoded cases. Fixed cases only for boundary values.
-- **Fast by default.** Property tests: 100 examples. Parametrize, don't duplicate.
-- **Run every test you write.** Never present tests as done without executing them.
-- **Never modify source code.** Only create/modify test files, conftest, and fixtures.
-- **Match project conventions.** Use existing test directory, naming, markers, fixture patterns.
+## Define the regression contract
 
-## Argument Routing
+Establish:
 
-Parse `$ARGUMENTS`:
+- actors, goals, and externally observable outcomes;
+- business rules and invariants that must never change;
+- critical paths and relevant rejection, timeout, retry, permission, concurrency, and partial-failure cases;
+- the current baseline and every intended behavior change;
+- KPIs with window, data set, acceptable variance, and justified pass or fail threshold;
+- systems crossed, production-like data needs, and evidence the available environment can provide.
 
-1. **No arguments** → **Mode A: Strategic Analysis** of the full project
-2. **Arguments resolve to existing file(s) or directory** → **Mode B: Targeted Generation** for those paths
-3. **Arguments are natural language** (not a valid path) → **Mode A: Strategic Analysis** with `$ARGUMENTS` as the goal. Analysis and recommendations are directed toward achieving that goal.
+Never invent a metric or threshold; record the gap.
+Match the proof's inputs and environment to the context it claims to model.
+A subprocess that represents normal runtime must not inherit test-only environment variables.
 
-To distinguish case 2 from 3: use Glob/Bash to check if `$ARGUMENTS` matches existing paths. If yes → Mode B. If no → Mode A with goal.
+## Choose the proof
 
----
+Prefer the highest reliable boundary:
 
-## Mode A: Strategic Analysis
+1. black-box tests through the public API, UI, job, event, or CLI;
+2. deep integration with the real database, queue, connector, or protocol;
+3. contract, replay, property, or characterization tests for narrower risks;
+4. unit tests for isolated rules where a wider test adds no confidence.
 
-Read `references/explorer-prompt.md`. Spawn an analysis subagent (Agent tool) with its contents as the prompt.
+Mock only beyond the verified boundary.
+For database or migration work, read [integration patterns](references/integration-patterns.md).
+When proving a process manager, worker, container entrypoint, or deployed artifact, use the real container or operating-system image.
+Verify worker replacement, signal handling, and graceful shutdown only when those boundaries apply.
 
-If `$ARGUMENTS` contains a goal (case 3 above), append to the subagent prompt:
+For strategy or audit only, return the contract, prioritized scenarios, proof method, and blind spots.
+Judge tests by failures caught, not assertion or coverage counts.
+Ask which states the proof covers and whether it includes the most fragile states.
 
-```
-## USER GOAL
-"$ARGUMENTS"
-Focus your analysis and recommendations on what is most relevant to this goal.
-Prioritize strategies that directly serve this objective.
-Explain WHY each recommendation helps achieve the goal.
-```
+## Prove a refactor differently
 
-After the subagent returns, display the full analysis inline to the user.
+A refactor keeps behavior. Capture a characterization baseline and observe it green on the unchanged code and after the refactor.
+Never break working behavior to watch a refactor test fail.
+If the baseline cannot run, name what is missing instead of lowering the proof standard.
 
-The user will either:
-- Select items by number or priority level → run **Mode B** for each selected item
-- Ask a follow-up question → answer using the analysis context
-- Say "skip" → end
+## Regression gate
 
----
+A regression gate compares a candidate with a trusted reference through complete agreed flows.
+Use one before merging a large refactor or significant behavior change when the agreed verification requires it.
+Run both versions with the same inputs and starting state, including representative data and edge cases.
+Keep writes away from production. List entry points, integrations, configurations, and flows the gate cannot reach.
+Compare externally visible results, side effects, failures, functional logs, and duration where relevant.
+Normalize only fields shown to vary when the reference runs against itself.
+Declare each intended difference with its reason and a real before and after.
+Fail on undeclared differences, missing declared differences, and flows that fail their intended outcome on either side.
 
-## Mode B: Targeted Generation
+The gate runs as one command and saves its comparison report.
+Prove it by comparing the reference with itself and by planting a known fault in a disposable candidate or captured output.
+Use coverage to find changed lines the gate misses, and explain the gaps. Coverage alone does not prove correctness.
+Never weaken a check or change an expected value merely to make it pass. Record and review legitimate changes.
 
-Read `references/testing-strategies.md` now. Keep its principles active throughout.
+## Autonomous work
 
-### Step 0: Verify Test Infrastructure
+Agree on the definition of done and a proven regression gate before an unattended run starts.
+Record the gate command, its evidence, and any declared differences in the plan.
+The [unattended-run rules](../../shared/unattended-runs.md) define the authorization and completion report.
 
-1. Identify project language from config files (pyproject.toml, package.json, pom.xml, build.gradle, Package.swift)
-2. Check test framework is installed and configured:
-   - Python: pytest in requirements/pyproject.toml, `tests/` or `test/` directory
-   - TypeScript: vitest/jest in package.json, test script defined
-   - Java: JUnit in pom.xml/build.gradle, `src/test/` exists
-   - Swift: XCTest/swift-testing target in Package.swift
-3. If test framework **missing**: stop and ask — "No test framework detected. Should I set up [pytest/vitest/JUnit] first?"
-4. If test directory **missing**: create it following language conventions
+## Prove a performance claim
 
-### Step 1: Read and Understand
+A performance claim needs a measurement that could contradict it.
+Measure unchanged and changed code with the same tool, environment, and data set.
+Name the tool and workload. Report the results and run-to-run spread, not one best run.
+For a hard maximum, define valid samples and repetitions before measuring, then judge the worst valid sample.
+Measure every required process or worker. Report setup separately from the measured interval.
+Profile before optimizing. An unmeasured performance claim remains unproven.
 
-1. Read the target file completely
-2. If a directory, read all source files in it
-3. Read the **relevant language section** from `references/language-templates.md` (Python, Java, TypeScript, or Swift — not the entire file)
+## Implement when asked
 
-### Step 2: Implementation Analysis
-
-For each public function/method/endpoint:
-
-**Boundaries:** numeric comparisons → extract thresholds, test N-1/N/N+1. String length limits, array sizes, enum ranges. Type coercion points (int/float, null).
-
-**State space:** if/else chains, switch/match, state machines. Focus on fragile states: error paths, fallbacks, retry, timeout. Which states are NOT reachable from current tests?
-
-**Invariants:** round-trip, idempotence, monotonicity, ordering preservation. Can a simpler reference implementation verify the result? Do aggregation totals match?
-
-**API surface** (endpoints): request/response schemas, status code branches, CRUD lifecycle, error formats.
-
-### Step 3: Strategy Selection
-
-Refer to `references/testing-strategies.md` strategy matrix to select strategies.
-
-If the target involves **refactoring**, also read `references/refactoring-workflow.md`.
-If the target involves **regression detection infrastructure**, also read `references/regression-detection.md`.
-
-| Code characteristic | Primary strategy | Secondary | Reference |
-|-------------------|-----------------|-----------|-----------|
-| Numeric thresholds | Boundary stress | Property-based | testing-strategies.md §1 |
-| Data transformation | Property-based (round-trip, invariant) | Boundary | testing-strategies.md §2 |
-| Parser / serializer | Fuzz + property-based | Boundary | testing-strategies.md §2 |
-| API endpoint (read) | Golden fixture regression | Boundary | testing-strategies.md §4 |
-| API endpoint (write) | CRUD lifecycle | Golden fixture | testing-strategies.md §5 |
-| State machine | State transition coverage | Boundary | testing-strategies.md §1 |
-| Algorithm / computation | Invariant (reference impl) | Property-based | testing-strategies.md §3 |
-| Pure function, few params | Boundary exhaustive | — | testing-strategies.md §1 |
-| DB queries / repositories | Real DB integration | Factory fixtures | integration-patterns.md |
-| Browser UI / user flows | Playwright E2E | Visual regression | e2e-browser-patterns.md |
-| Legacy code, pre-refactoring | Characterization (golden master) | Approval test | refactoring-workflow.md |
-| Concurrent / async operations | Concurrency stress | Property-based | testing-strategies.md §10 |
-| Microservice boundary | Contract test (Pact) | CRUD lifecycle | testing-strategies.md §11 |
-| DB migrations | Up/down verification | Rollback test | integration-patterns.md |
-| Migration legacy to new | Live comparison | Characterization | testing-strategies.md §6 |
-
-### Step 4: Generate Tests
-
-Generate the test file. For each test function:
-
-1. **Descriptive name** — describes behavior, not method name
-2. **AAA structure** — Arrange, Act, Assert (clearly separated)
-3. **Strong assertions** — specific values, check `references/weak-assertion-patterns.md`
-4. **Boundary tests** — N-1, N, N+1 at every threshold
-5. **Property-based tests** — for data transformations (hypothesis, jqwik, fast-check)
-6. **Random stress tests** — for complex logic, verify invariants over many iterations
-7. **Error path tests** — invalid inputs, null/empty, type mismatches
-
-For golden fixture / e2e patterns, generate BOTH the capture script and the regression test.
-
-**Apply reference patterns by type:**
-- DB integration → `references/integration-patterns.md`
-- Playwright E2E → `references/e2e-browser-patterns.md`
-- Characterization → `references/refactoring-workflow.md`
-- Concurrency → `references/testing-strategies.md` §10 + `references/language-templates.md`
-- Contract → `references/language-templates.md` Pact scaffolds
-
-### Step 5: Run and Verify
-
-1. Run generated tests with project's test command
-2. Read output completely
-3. If tests fail: fix the TEST (not source code), re-run
-4. **Mutation check** — for each critical assertion:
-   - Temporarily change expected value to something wrong
-   - Run test — confirm it FAILS
-   - Restore correct assertion
-   - If test passes with wrong value → assertion is tautological, rewrite it
-
-### Step 6: Quality Report
-
-```
-## Test Generation Report: [target]
-
-| Metric | Value | Target | Status |
-|--------|-------|--------|--------|
-| Tests generated | N | — | — |
-| Assertion density | X/test | >= 2 | OK/WARN |
-| Boundary tests | N | >= 1 per threshold | OK/WARN |
-| Property-based tests | N | >= 1 per transform | OK/WARN |
-| Weak assertions | N | 0 | OK/WARN |
-| Random/fuzz tests | N | >= 1 for complex logic | OK/WARN |
-| Integration tests (real DB) | N | >= 1 per repository/query | OK/WARN/N/A |
-| E2E browser tests | N | >= 1 per critical flow | OK/WARN/N/A |
-| Characterization tests | N | >= 1 per legacy module | OK/WARN/N/A |
-| Concurrency tests | N | >= 1 per shared resource | OK/WARN/N/A |
-
-### Strategies Applied
-[list each strategy and what it covered]
-
-### NOT Tested (and why)
-[Functions/paths deliberately excluded with justification]
-```
+Follow project layout and the development loop.
+Add the smallest important proof, observe it fail, make approved source changes, then observe it pass.
+Assert outcomes, state, events, metrics, and error contracts rather than calls.
+Run focused and relevant suites. Report what the evidence proves and what it does not cover.
