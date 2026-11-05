@@ -103,7 +103,7 @@ No PR without a passing `/eval-regression`. Open an issue first.
 
 ## Fork Maintenance
 
-Run once on each machine after cloning. It symlinks `global/CLAUDE.md` and `global/skills/` into your Claude Code config and makes the `upstream` remote fetch-only:
+Run on each machine after cloning. It symlinks `global/CLAUDE.md`, downloads the skills listed in `global/skills.txt` from their authors, and makes the `upstream` remote fetch-only. Rerun it to update those skills:
 
 ```bash
 make setup

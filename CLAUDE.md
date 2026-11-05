@@ -17,7 +17,7 @@ plugins/                          # Claude Code plugins (each independently inst
   postgres-mcp/                   # PostgreSQL MCP server integration
 docs/                             # Documentation
   claude-code-reference/          # Official Claude Code reference docs
-global/                           # Personal global CLAUDE.md, skills + per-machine installer
+global/                           # Personal global CLAUDE.md, skill links + per-machine installer
 scripts/                          # One-way upstream skill sync
 .claude-plugin/plugin.json        # Plugin metadata + version (v0.1.0)
 .claude-plugin/marketplace.json   # Marketplace config (7 plugins)

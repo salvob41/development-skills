@@ -1,47 +1,63 @@
 #!/usr/bin/env bash
-# Run once per machine after cloning: links the global CLAUDE.md and skills, and makes upstream fetch-only.
+# Run on each machine after cloning: links the global CLAUDE.md, downloads the skills in
+# global/skills.txt from their authors, and makes upstream fetch-only. Rerun to update the skills.
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 upstream_url="https://github.com/reidemeister94/development-skills.git"
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
 
-# Replaces $2 with a link to $1, moving anything different to $3 so nothing is lost.
-link_path() {
-  local source_path="$1" target="$2" backup_dir="$3"
-  if [ "$target" -ef "$source_path" ]; then
-    echo "ok      $target"
-    return
+# Moves $1 to $2 so nothing is lost; a symlink holds nothing worth keeping.
+move_aside() {
+  if [ -L "$1" ]; then
+    rm "$1"
+  elif [ -e "$1" ]; then
+    mkdir -p "$2"
+    mv "$1" "$2/$(basename "$1").$(date +%Y%m%d%H%M%S)"
+    echo "backup  $1 -> $2"
   fi
-  mkdir -p "$(dirname "$target")"
-  if [ -L "$target" ]; then
-    rm "$target"
-  elif [ -e "$target" ]; then
-    if diff -r "$target" "$source_path" >/dev/null 2>&1; then
-      rm -rf "$target"
-    else
-      mkdir -p "$backup_dir"
-      mv "$target" "$backup_dir/$(basename "$target").$(date +%Y%m%d%H%M%S)"
-      echo "backup  $target -> $backup_dir"
-    fi
-  fi
-  ln -s "$source_path" "$target"
-  echo "linked  $target"
 }
 
-link_config_dir() {
+install_config_dir() {
   # Backups live outside skills/, where a copy would load as a duplicate skill.
-  local dir="$1" backup_dir="$1/global-backups" skill
-  link_path "$repo/global/CLAUDE.md" "$dir/CLAUDE.md" "$backup_dir"
-  for skill in "$repo"/global/skills/*; do
-    link_path "$skill" "$dir/skills/$(basename "$skill")" "$backup_dir"
+  local dir="$1" backup_dir="$1/global-backups" skill target
+  mkdir -p "$dir/skills"
+
+  if [ "$dir/CLAUDE.md" -ef "$repo/global/CLAUDE.md" ]; then
+    echo "ok      $dir/CLAUDE.md"
+  else
+    if ! cmp -s "$dir/CLAUDE.md" "$repo/global/CLAUDE.md"; then
+      move_aside "$dir/CLAUDE.md" "$backup_dir"
+    fi
+    ln -sf "$repo/global/CLAUDE.md" "$dir/CLAUDE.md"
+    echo "linked  $dir/CLAUDE.md"
+  fi
+
+  for skill in "$work"/*; do
+    target="$dir/skills/$(basename "$skill")"
+    if [ ! -L "$target" ] && diff -r "$target" "$skill" >/dev/null 2>&1; then
+      echo "ok      $target"
+    else
+      move_aside "$target" "$backup_dir"
+      cp -R "$skill" "$target"
+      echo "fetched $target"
+    fi
   done
 }
 
 cd "$repo"
 
-link_config_dir "$HOME/.claude"
-[ -d "$HOME/.claude-personal" ] && link_config_dir "$HOME/.claude-personal"
-[ -n "${CLAUDE_CONFIG_DIR:-}" ] && link_config_dir "$CLAUDE_CONFIG_DIR"
+# Download everything first, so a failed download changes nothing.
+while read -r name url; do
+  mkdir -p "$work/$name"
+  # Claude can't invoke a skill with this flag, and the global rules need it to.
+  curl -fsSL "$url" | sed '/^disable-model-invocation: true$/d' >"$work/$name/SKILL.md"
+done <global/skills.txt
+
+install_config_dir "$HOME/.claude"
+[ -d "$HOME/.claude-personal" ] && install_config_dir "$HOME/.claude-personal"
+[ -n "${CLAUDE_CONFIG_DIR:-}" ] && install_config_dir "$CLAUDE_CONFIG_DIR"
 
 git remote get-url upstream >/dev/null 2>&1 || git remote add upstream "$upstream_url"
 # Sync is one-way: pushes to upstream fail, and gh targets this fork instead of the parent repo.
