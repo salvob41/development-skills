@@ -38,7 +38,6 @@ link_config_dir() {
 }
 
 cd "$repo"
-git submodule update --init --quiet
 
 link_config_dir "$HOME/.claude"
 [ -d "$HOME/.claude-personal" ] && link_config_dir "$HOME/.claude-personal"
